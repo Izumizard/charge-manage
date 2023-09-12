@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 功能：
+ * 功能：接口统一返回包装类
  * 日期：2023/9/13 0:32
  */
 

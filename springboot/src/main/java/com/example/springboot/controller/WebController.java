@@ -1,7 +1,9 @@
 package com.example.springboot.controller;
 
 import com.example.springboot.common.Result;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -9,9 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
  * 日期：2023/9/12 18:19
  */
 @RestController
+@RequestMapping("/web")
 public class WebController {
-    @RequestMapping
-    public Result hello(){
-            return Result.sucess("扣一");
+
+    @GetMapping ("/hello")
+    public Result hello(String name){
+            return Result.sucess(name);
     }
 }
