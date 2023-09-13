@@ -29,13 +29,24 @@ public class Result {
     public static Result sucess() {
         return Result.builder().code(CODE_SUCCESS).msg("请求成功").build();
     }
+
     public static Result sucess(Object data) {
         return new Result(CODE_SUCCESS,"请求成功",data);
     }
+    public static  Result sucess(String msg) {
+        return new Result(CODE_SUCCESS,msg,null);
+    }
+
     public static Result error(String code,String msg) {
         return new Result(code,msg,null);
     }
+
+    public static Result error(String msg) {
+        return new Result(CODE_SYS_ERROR,msg,null);
+    }
+
     public static Result error() {
         return new Result(CODE_SYS_ERROR,"系统错误",null);
     }
+
 }
