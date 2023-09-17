@@ -1,40 +1,48 @@
 <template>
   <div>
-  <div style="background-color: white; padding:10px 20px; border-radius: 5px;">
+  <div style="background-color: white; padding:10px 20px; border-radius: 8px;">
     <div class="model_mg">
       <el-tooltip :content="'表格斑马纹'" placement="top">
         <el-switch
           class="switch_cl"
-          v-model="stripechange"
+          v-model="Striped"
           active-color="#1677ff"
           inactive-color="#bfbfbf"
           :active-value="true"
           :inactive-value="false"
           active-text="开"
           inactive-text="关"
-          @change="stripeChange"
+          @change="changeStriped"
         >
         </el-switch>
       </el-tooltip>
-    <el-button class="button_pr"type="primary"  icon="el-icon-plus">新 建</el-button>
+    <el-button class="button_pr" type="primary"  icon="el-icon-plus">新 建</el-button>
     <el-button type="danger" icon="el-icon-delete" style="color: #fff">删 除</el-button>
     </div>
   </div>
     <div>
   <el-table
       :data="tableData.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
-      stripe:false
-      style="width: 100%;margin-top: 15px;" max-height="250"
+      :stripe="Striped"
+      style="width: 100%;margin-top: 15px; font-size: 14px !important; cursor: pointer; border-radius: 8px;
+      box-shadow: none !important;"
+      max-height="500"
       v-loading="loading"
+      @cell-click="openDetails"
       element-loading-text="正在加载用户数据"
       element-loading-spinner="el-icon-loading"
-      element-loading-background="rgba(0, 0,0, 0.8)"
+      element-loading-background="rgba(0, 0,0, 0.6)"
       >
     <el-table-column
         type="selection"
         width="55"
         align="center"
     >
+    </el-table-column>
+    <el-table-column
+        label="头像"
+        prop="avatar"
+        align="center">
     </el-table-column>
     <el-table-column
         label="用户名"
@@ -59,12 +67,9 @@
     <el-table-column
         label="地址"
         prop="address"
-        align="center">
-    </el-table-column>
-    <el-table-column
-        label="头像"
-        prop="avatar"
-    align="center">
+        align="center"
+        show-overflow-tooltip
+    >
     </el-table-column>
     <el-table-column>
       <template slot="header" slot-scope="scope">
@@ -75,23 +80,85 @@
           <i slot="prefix" class="el-input__icon el-icon-search"></i>
         </el-input>
       </template>
-      <template slot-scope="scope"class=".button-container">
+
+
+
+
+      <template slot-scope="scope" class=".button-container">
+        <span>&nbsp;&nbsp;</span>
         <el-button
             size="small"
             plain
-            @click="handleEdit(scope.$index, scope.row)">编 辑</el-button>
+            @click="handleEdit(scope.$index, scope.row); $event.stopPropagation()">
+          编 辑</el-button>
         <span style="margin-right: 20px;"></span>
+        <el-popconfirm
+            icon="el-icon-info"
+            icon-color="red"
+            title="确定删除这条用户信息？"
+        >
         <el-button
             size="small"
             type="danger"
             plain
-            style="margin-left: 0"
-            @click="handleDelete(scope.$index, scope.row)">删 除</el-button>
+            slot="reference"
+            style="margin-left: 0 !important;"
+            @click="handleDelete(scope.$index, scope.row);  $event.stopPropagation()">
+          删 除</el-button>
+        </el-popconfirm>
       </template>
     </el-table-column>
   </el-table>
+
+
+      <!-- 弹窗 -->
+      <el-dialog v-if="showDialog" :visible.sync="showDialog"
+                 title="用户详情" :show-close="false" :center="true" class="dialog_cl">
+        <el-skeleton
+            style="width: 240px"
+            animated
+            :throttle="500"/>
+
+        <h2 style="align-items: center">{{showRow.avatar}}</h2>
+        <div style="padding-left: 20px;">
+        <el-form :model="showRow" label-width="100px" style="margin-top: 130px !important;">
+          <el-form-item label="用户名称">
+            <template v-slot:label>
+              <div class="label-cl">
+                <i class="el-icon-user icon" style="margin-right: 20px;"></i>
+                <span class="label-text">用户名:</span>
+              </div>
+            </template>
+            {{showRow.username}}
+          </el-form-item>
+          <el-form :model="showRow" label-width="100px">
+            <el-form-item label="用户密码">
+              <template v-slot:label>
+                <div class="label-cl">
+                  <i class="el-icon-lock icon" style="margin-right: 5px;"></i>
+                  <span class="label-text">用户密码:</span>
+                </div>
+              </template>
+              {{showRow.password}}
+            </el-form-item>
+          </el-form>
+          <el-form-item label="账户余额" style="color: rgb(0,188,18);">
+            <template v-slot:label>
+              <div class="label-cl">
+                <i class="el-icon-money icon" style="margin-right: 5px;"></i>
+                <span class="label-text">账户余额:</span>
+              </div>
+            </template>
+            ￥{{showRow.balance}}
+          </el-form-item>
+        </el-form>
+        </div>
+      </el-dialog>
+
+
+
+        </div>
   </div>
-</div>
 </template>
 
 <script>
@@ -100,28 +167,47 @@ export default {
 
   data() {
     return {
+      showRow: {},
       tableData: [{
+        avater:'',
+        username:'qwe',
         date: '2016-05-02',
         name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
+        address: '上海市普陀区金沙江路 1518 弄',
+        balance: '50'
       }, {
+        username:'qwe1',
         date: '2016-05-04',
         name: '刘小虎',
         address: '上海市普陀区金沙江路 1517 弄'
       }, {
+        username:'qwe2',
         date: '2016-05-01',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1519 弄'
       }, {
+        username:'qwe2',
         date: '2016-05-03',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1516 弄'
       }],
       search: '',
       loading: false,
-      StripeChange:true
+      Striped: false,
+      showDialog: false, // 弹窗的显示与隐藏
     }
   },
+
+
+
+  mounted() {
+    // 在页面加载时从本地存储中读取选择状态
+    const selection = localStorage.getItem('changeStriped');
+    if (selection !== null) {
+      this.Striped = JSON.parse(selection);
+    }
+  },
+
   methods: {
     handleEdit(index, row) {
       console.log(index, row);
@@ -130,9 +216,23 @@ export default {
       console.log(index, row);
     },
 
-  // stripeChage() {
-  //     this.stripeChage() = ! this.strpie()
-  // }
+    changeStriped() {
+      this.isStriped = !this.isStriped;
+      // 在选择switch时将选择状态保存到本地存储
+      localStorage.setItem('changeStriped', JSON.stringify(this.Striped));
+    },
+
+
+    openDetails (row, column, cell, event){
+      if (column.type === 'selection' ) {
+        event.stopPropagation(); // 阻止事件冒泡，不触发弹出窗口
+      } else {
+        // 处理其他单元格点击事件，弹出窗口等逻辑
+        this.showRow = row;
+        this.showDialog = true;
+      }
+    },
+
 
 
   },
@@ -187,7 +287,7 @@ export default {
   display: block;
 }
 .el-switch__label *{
-  font-size: 5px !important;
+  font-size: 1px !important;
 }
 
 
@@ -199,5 +299,20 @@ export default {
 }
 .button_pr:hover{
   background-color: rgba(22, 119, 255, 0.8) !important;
+}
+
+.el-dialog{
+  width:20% !important;
+  height:60% !important;
+  border-radius: 12px !important;
+}
+
+
+.label-cl {
+  display: flex;
+  align-items: center;
+}
+.icon {
+
 }
 </style>

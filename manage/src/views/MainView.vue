@@ -2,33 +2,35 @@
   <div>
     <el-container>
       <!--   侧边栏  -->
-      <el-aside :width="asideWidth" style="min-height: 100vh; background-color:#011635;">
-       <div style="height:60px; line-height:60px; color : white; display:flex;align-items:center;justify-content: center;">
-         <!--  logo    -->
-         <img src="@/assets/logo1.png" alt="" style="width: 40px; height: 40px;" />
-         <span class="logo-title" v-show="!isCollapse">C.M.System</span>
-       </div>
+      <el-aside :width="asideWidth" style="min-height: 100vh; background-color:#011635;border-radius: 12px">
+        <div style="height:60px; line-height:60px; color : white; display:flex;align-items:center;
+        justify-content: center;">
+          <!--  logo    -->
+          <img src="@/assets/logo1.png" alt="" style="width: 40px; height: 40px;" />
+          <span class="logo-title" v-show="!isCollapse">C.M.System</span>
+        </div>
 
         <el-menu :collapse="isCollapse" :collapse-transition="false" router background-color="#011635"
-                 text-color="rgba(255,255,255,0.65)" active-text-color="#fff" style="border: none" :default-active='$route.path'>
+                 text-color="rgba(255,255,255,0.65)" active-text-color="#fff" style="border: none"
+                 :default-active='$route.path'>
           <el-menu-item index="/home">
             <i class="el-icon-house"></i>
             <span slot="title">系统首页</span>
           </el-menu-item>
 
-            <el-menu-item index="/usermanage">
-              <i class="el-icon-user"></i>
-              <span  slot="title">用户管理</span>
-            </el-menu-item>
+          <el-menu-item index="/usermanage">
+            <i class="el-icon-user"></i>
+            <span  slot="title">用户管理</span>
+          </el-menu-item>
 
-            <el-menu-item  index="/chargemanage">
-              <i class="el-icon-monitor"></i>
-              <span slot="title">充电桩管理</span>
-            </el-menu-item>
+          <el-menu-item  index="/chargemanage">
+            <i class="el-icon-monitor"></i>
+            <span slot="title">充电桩管理</span>
+          </el-menu-item>
 
           <el-menu-item index="/order">
             <i class="el-icon-wallet"></i>
-             <span slot="title">订单管理</span>
+            <span slot="title">订单管理</span>
           </el-menu-item>
 
           <el-submenu>
@@ -53,24 +55,24 @@
           </div>
 
           <div style="flex: 1; margin-top: 34px; display: flex; align-items: center; margin-left: 20px">
-          <el-tabs class="custom-tabs" v-model="editableTabsValue" type="card" closable @tab-remove="removeTab">
-            <el-tab-pane
-                v-for="(item, index) in editableTabs"
-                :key="item.name"
-                :label="item.title"
-                :name="item.name"
-            >
+            <el-tabs class="custom-tabs" v-model="editableTabsValue" type="card" closable @tab-remove="removeTab">
+              <el-tab-pane
+                  v-for="(item, index) in editableTabs"
+                  :key="item.name"
+                  :label="item.title"
+                  :name="item.name"
+              >
 
-            </el-tab-pane>
-          </el-tabs>
+              </el-tab-pane>
+            </el-tabs>
           </div>
 
 
           <div style="flex: 1; width: 0; display: flex; align-items: center; justify-content: flex-end;">
             <el-dropdown placement="bottom">
               <div style="display: flex; align-items: center; cursor: default">
-              <img src="@/assets/img1.png" alt="" style="width: 40px; height: 40px; margin: 0 5px">
-              <span style="margin-left: 5px !important">管理员</span>
+                <img src="@/assets/img1.png" alt="" style="width: 40px; height: 40px; margin: 0 5px">
+                <span style="margin-left: 5px !important">管理员</span>
               </div>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item><i class="el-icon-admin" ></i>个人信息</el-dropdown-item>
@@ -84,7 +86,7 @@
         <!--  主体区域  -->
         <el-main>
 
-            <router-view></router-view>
+          <router-view></router-view>
 
 
         </el-main>
@@ -166,6 +168,7 @@ export default {
 .el-menu--inline .el-menu-item{
   background-color: #041322 !important;
   padding-left: 49px !important;
+  transition: none !important;
 }
 .el-menu-item:hover,.el-submenu__title:hover,.el-submenu__title:hover i,.el-menu-item:hover i {
   color:#fff !important;
@@ -182,6 +185,7 @@ export default {
 .el-menu-item {
   height: 40px !important;
   line-height: 40px !important;
+  transition: none !important;
 }
 .el-submenu__title{
   height: 40px !important;
@@ -199,10 +203,12 @@ export default {
 }
 .el-submenu .el-menu-item {
   min-width: 0 !important;
+  transition: none !important;
 
 }
 .el-menu--inline .el-menu-item.is-active{
   padding-left: 45px !important;
+  transition: none !important;
 }
 .el-aside {
   transition: width .4s;
@@ -221,6 +227,7 @@ export default {
   box-shadow: 2px 0 6px rgba(0,21,41,.35);
   display: flex;
   align-items: center;
+  border-radius: 8px !important;
 }
 
 .el-card__body, .el-main {
@@ -228,9 +235,9 @@ export default {
 }
 
 <!--标签页-->
-.custom-tabs .el-tabs__item {
-  border-radius: 8px !important;
-}
+    .custom-tabs .el-tabs__item {
+      border-radius: 8px !important;
+    }
 .custom-tabs .el-tabs__active-bar {
   border-radius: 8px !important;
 }
