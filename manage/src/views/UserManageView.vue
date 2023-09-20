@@ -114,11 +114,14 @@
       <!-- 弹窗 -->
       <el-dialog v-if="showDialog" :visible.sync="showDialog"
                  title="用户详情" :show-close="false" :center="true" class="dialog_cl">
-        <el-skeleton
-            style="width: 240px"
-            animated
-            :throttle="500"/>
 
+        <template slot="template">
+        <el-skeleton-item
+            variant="image"
+            animated
+            :throttle="500"
+            style="width: 240px; height: 240px;"
+        />
         <h2 style="align-items: center">{{showRow.avatar}}</h2>
         <div style="padding-left: 20px;">
         <el-form :model="showRow" label-width="100px" style="margin-top: 130px !important;">
@@ -153,6 +156,7 @@
           </el-form-item>
         </el-form>
         </div>
+        </template>
       </el-dialog>
 
 
