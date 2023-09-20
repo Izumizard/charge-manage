@@ -115,16 +115,14 @@
       <el-dialog v-if="showDialog" :visible.sync="showDialog"
                  title="用户详情" :show-close="false" :center="true" class="dialog_cl">
 
-        <template slot="template">
-        <el-skeleton-item
-            variant="image"
-            animated
-            :throttle="500"
-            style="width: 240px; height: 240px;"
-        />
-        <h2 style="align-items: center">{{showRow.avatar}}</h2>
+<!--        <div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px;">-->
+<!--          <el-skeleton-item variant="image" animated :throttle="500" style="width: 100px; height: 100px;" />-->
+          <div style="display: flex; justify-content: center; align-items: center; margin-top: 5px;">
+            <img :src="showRow.avatar" style="width: 100px; height: 100px;">
+          </div>
+<!--        </div>-->
         <div style="padding-left: 20px;">
-        <el-form :model="showRow" label-width="100px" style="margin-top: 130px !important;">
+        <el-form :model="showRow" label-width="100px" style="margin-top: 20px !important;">
           <el-form-item label="用户名称">
             <template v-slot:label>
               <div class="label-cl">
@@ -156,7 +154,7 @@
           </el-form-item>
         </el-form>
         </div>
-        </template>
+
       </el-dialog>
 
 
@@ -173,7 +171,7 @@ export default {
     return {
       showRow: {},
       tableData: [{
-        avater:'',
+        avatar:'https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg',
         username:'qwe',
         date: '2016-05-02',
         name: '王小虎',

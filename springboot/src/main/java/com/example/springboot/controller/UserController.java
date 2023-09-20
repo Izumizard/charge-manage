@@ -1,5 +1,6 @@
 package com.example.springboot.controller;
 
+import com.example.springboot.common.Page;
 import com.example.springboot.common.Result;
 import com.example.springboot.entity.User;
 import com.example.springboot.service.UserService;
@@ -38,6 +39,7 @@ public class UserController {
 
         return Result.sucess("注册成功！");
     }
+
 
     /**
      * 修改用户信息
@@ -102,5 +104,27 @@ public class UserController {
     public Result selectByMore(@RequestParam String username, @RequestParam String name) {
         List<User> userList = userService.selectByMore(username,name);
         return Result.sucess(userList);
+    }
+
+
+    /**
+     * 多条件模糊查询用户信息
+     */
+    @GetMapping("/selectByBlur")
+    public Result selectByBlur(@RequestParam String username, @RequestParam String name) {
+        List<User> userList = userService.selectByBlur(username,name);
+        return Result.sucess(userList);
+    }
+
+    /**
+     * 分页多条件模糊查询用户信息
+     * pageNum 是当前的页码
+     */
+    @GetMapping("/selectByPage")
+    public Result selectByPage(@RequestParam Integer pageNum,
+                               @RequestParam Integer pageSize,
+                               @RequestParam String username, @RequestParam String name) {
+        Page<User> page = userService.selectByPage(pageNum, pageSize, username, name);
+        return Result.sucess(page);
     }
 }
