@@ -55,14 +55,20 @@
           </div>
 
           <div style="flex: 1; margin-top: 34px; display: flex; align-items: center; margin-left: 20px">
-            <el-tabs class="custom-tabs" v-model="editableTabsValue" type="card" closable @tab-remove="removeTab">
+            <el-tabs
+                v-model="activeTab"
+                type="card"
+                closable
+                @tab-remove="removeTab"
+                @tab-click="clickBtn"
+            >
               <el-tab-pane
-                  v-for="(item, index) in editableTabs"
-                  :key="item.name"
+                  :key="index"
+                  v-for="(item, index) in tabList"
                   :label="item.title"
-                  :name="item.name"
+                  :name="item.path"
               >
-
+                {{ item.content }}
               </el-tab-pane>
             </el-tabs>
           </div>
@@ -86,8 +92,12 @@
         <!--  主体区域  -->
         <el-main>
 
-          <router-view></router-view>
-
+          <transition name="fade" mode="out-in">
+            <keep-alive>
+              <router-view v-if="$route.meta.keepAlive"></router-view>
+            </keep-alive>
+          </transition>
+          <router-view v-if="!$route.meta.keepAlive"></router-view>
 
         </el-main>
       </el-container>
@@ -97,6 +107,7 @@
 
 <script>
 
+import store from '../../src/store'
 export default {
   name: "HomeView",
   data() {
@@ -106,19 +117,32 @@ export default {
       collapseIcon: 'el-icon-s-unfold',
 
 
-      editableTabsValue: '2',
-      editableTabs: [{
-        title: 'Tab 1',
-        name: '1',
-        content: 'Tab 1 content'
-      }, {
-        title: 'Tab 2',
-        name: '2',
-        content: 'Tab 2 content'
-      }],
-      tabIndex: 2
+      activeTab: '',
     }
   },
+
+
+  components: {},
+  computed: {
+    tabList() {
+      return store.getters['getTabs']
+    },
+  },
+  watch: {
+    $route: function () {
+      this.setActiveTab()
+      this.addTab()
+    },
+  },
+  created() {
+  },
+  mounted() {
+    this.beforeRefresh()
+    this.setActiveTab()
+    this.addTab()
+  },
+
+
   methods: {
     // 动态控制展开与收起和切换对应图标
     handleCollapse() {
@@ -126,37 +150,71 @@ export default {
       this.asideWidth = this.isCollapse ? '64px' : '200px'
       this.collapseIcon = this.isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'
     },
-
-
-
-    addTab(targetName) {
-      let newTabName = ++this.tabIndex + '';
-      this.editableTabs.push({
-        title: 'New Tab',
-        name: newTabName,
-        content: 'New Tab content'
-      });
-      this.editableTabsValue = newTabName;
+    // 设置活跃的tab
+    setActiveTab() {
+      this.activeTab = this.$route.path
     },
-    removeTab(targetName) {
-      let tabs = this.editableTabs;
-      let activeName = this.editableTabsValue;
-      if (activeName === targetName) {
-        tabs.forEach((tab, index) => {
-          if (tab.name === targetName) {
-            let nextTab = tabs[index + 1] || tabs[index - 1];
-            if (nextTab) {
-              activeName = nextTab.name;
-            }
+    // 添加tab
+    addTab() {
+      const {path, meta} = this.$route
+      const tab = {
+        path,
+        title: meta.title,
+      }
+      store.commit('addTab', tab)
+    },
+    // 点击tab
+    clickBtn(tab) {
+      const {name} = tab
+      this.$router.push({path: name})
+    },
+    // 删除tab
+    removeTab(target) {
+      let active = this.activeTab;
+      const tabs = this.tabList;
+
+      // 查找目标标签页的索引
+      const index = tabs.findIndex((tab) => tab.path === target);
+
+      if (index !== -1) {
+        // 移除目标标签页
+        tabs.splice(index, 1);
+
+        if (tabs.length === 0) {
+          // 如果标签页列表为空，则跳转到首页
+          this.$router.push('/home');
+        } else if (active === target) {
+          // 删除当前激活的标签页时，将活跃标签页切换到上一个或下一个标签页
+          const nextTab = tabs[index] || tabs[index - 1];
+          if (nextTab) {
+            active = nextTab.path;
+          } else {
+            active = '/home'; // 如果没有上一个或下一个标签页，则将首页设为活跃标签页
           }
-        });
+        }
       }
 
-      this.editableTabsValue = activeName;
-      this.editableTabs = tabs.filter(tab => tab.name !== targetName);
-    }
-  }
+      // 更新当前激活的选项卡和选项卡列表
+      this.activeTab = active;
+      store.state.tabList = tabs.filter((tab) => tab.path !== target);
+    },
+    // 解决刷新数据丢失问题
+    beforeRefresh() {
+      window.addEventListener('beforeunload', () => {
+        sessionStorage.setItem('tabsView', JSON.stringify(this.tabList))
+      })
+      let tabSession = sessionStorage.getItem('tabsView')
+      if (tabSession) {
+        let oldTabs = JSON.parse(tabSession)
+        if (oldTabs.length > 0) {
+          store.state.tabList = oldTabs
+        }
+      }
+    },
+  },
 }
+
+
 
 
 </script>
@@ -244,5 +302,12 @@ export default {
 .custom-tabs .el-tabs__item.is-active {
   border-bottom-left-radius: 8px !important;;
   border-bottom-right-radius: 8px !important;;
+}
+
+.el-tabs__item:hover .el-icon-close:before {
+  display: inline-block !important;
+}
+.el-tabs__item .el-icon-close:before {
+  display: none !important;
 }
 </style>

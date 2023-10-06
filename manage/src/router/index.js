@@ -6,7 +6,7 @@ import UserManageView from "@/views/UserManageView";
 import ChargeManageView from "@/views/ChargeManageView";
 import OrderManageView from "@/views/OrderManageView";
 import AdminstratorView from "@/views/AdminstratorView";
-import noticeManageView from "@/views/NoticeManageView";
+import NoticeManageView from "@/views/NoticeManageView";
 
 Vue.use(VueRouter)
 
@@ -23,12 +23,12 @@ const routes = [
     name: "main",
     component: MainView,
     children : [
-      { path:'home', name:'home',component:HomeView },
-      { path:'usermanage',name:'usermanage',component: UserManageView },
-      { path:'chargemanage', name: 'chargemanage', component:ChargeManageView },
-      { path:'order', name: 'order', component:OrderManageView },
-      { path:'notice', name: 'notice', component:noticeManageView },
-      { path:'admininfo', name: 'admininfo', component:AdminstratorView},
+      { path:'home', name:'home', component:HomeView, meta:{ keepAlive:true, comp:HomeView, title:'首页'} },
+      { path:'usermanage',name:'usermanage',component: UserManageView, meta:{ keepAlive:true, comp:UserManageView, title:'用户管理'}},
+      { path:'chargemanage', name: 'chargemanage', component:ChargeManageView, meta:{ keepAlive:true, comp:ChargeManageView, title:'充电管理'}},
+      { path:'order', name: 'order', component:OrderManageView, meta:{ keepAlive:true, comp:OrderManageView, title:'订单管理'}},
+      { path:'notice', name: 'notice', component:NoticeManageView, meta:{ keepAlive:true, comp:NoticeManageView, title:'通知信息'}},
+      { path:'admininfo', name: 'admininfo', component:AdminstratorView, meta:{ keepAlive:true, comp:AdminstratorView, title:'管理员信息'}},
     ]
   },
 ]

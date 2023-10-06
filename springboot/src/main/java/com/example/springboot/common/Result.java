@@ -26,14 +26,14 @@ public class Result {
     private Object data;
 
 
-    public static Result sucess() {
+    public static Result success() {
         return Result.builder().code(CODE_SUCCESS).msg("请求成功").build();
     }
 
-    public static Result sucess(Object data) {
+    public static Result success(Object data) {
         return new Result(CODE_SUCCESS,"请求成功",data);
     }
-    public static  Result sucess(String msg) {
+    public static  Result success(String msg) {
         return new Result(CODE_SUCCESS,msg,null);
     }
 
