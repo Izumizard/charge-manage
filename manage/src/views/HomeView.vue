@@ -3,12 +3,12 @@
     <scroll-view class=".container_scroll" scroll-y :style="{ height: wh + 'px' }">
   <div style="box-shadow: 0 0 10px rgba(0,0,0,.1); padding:10px 20px; border-radius: 8px; margin-bottom: 20px;
   background-color: white">
-    <i class="el-icon-guangbo" style="margin-right: 5px"></i> 本系统仅供内部测试使用，不做商业用途。
+    <i class="el-icon-broadcast" style="margin-right: 5px"></i> 本系统仅供内部测试使用，不做商业用途。
   </div>
   <div class="carousel_cl" style="padding: 10px 20px; margin-bottom: 20px;">
     <el-carousel indicator-position="outside" :height="banH +'px'">
       <el-carousel-item v-for="item in 4" :key="item">
-        <h3>{{ item }}</h3>
+
       </el-carousel-item>
     </el-carousel>
   </div>

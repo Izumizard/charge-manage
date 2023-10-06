@@ -22,7 +22,7 @@
   </div>
     <div>
   <el-table
-      :data="tableData.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
+      :data="users"
       :stripe="Striped"
       style="width: 100%;margin-top: 15px; font-size: 14px !important; cursor: pointer; border-radius: 8px;
       box-shadow: none !important;"
@@ -38,6 +38,12 @@
         width="55"
         align="center"
     >
+    </el-table-column>
+
+    <el-table-column
+        label="ID"
+        prop="id"
+        align="center">
     </el-table-column>
     <el-table-column
         label="头像"
@@ -123,7 +129,7 @@
 <!--        </div>-->
         <div style="padding-left: 20px;">
         <el-form :model="showRow" label-width="100px" style="margin-top: 20px !important;">
-          <el-form-item label="用户名称">
+          <el-form-item label="用户名">
             <template v-slot:label>
               <div class="label-cl">
                 <i class="el-icon-user icon" style="margin-right: 20px;"></i>
@@ -164,12 +170,16 @@
 </template>
 
 <script>
+
+import request from "@/utils/request";
+
 export default {
   name: "UserManageView",
 
   data() {
     return {
       showRow: {},
+      users:[],
       tableData: [{
         avatar:'https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg',
         username:'qwe',
@@ -203,6 +213,10 @@ export default {
 
 
   mounted() {
+    request.get('/user/selectAll').then(res => {
+      console.log(res.data)
+      this.users = res.data
+    })
     // 在页面加载时从本地存储中读取选择状态
     const selection = localStorage.getItem('changeStriped');
     if (selection !== null) {

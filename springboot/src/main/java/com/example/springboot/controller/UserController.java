@@ -37,7 +37,7 @@ public class UserController {
 
         }
 
-        return Result.sucess("注册成功！");
+        return Result.success("注册成功！");
     }
 
 
@@ -47,7 +47,7 @@ public class UserController {
     @PutMapping("/update")
     public Result update(@RequestBody User user) {
         userService.updateUser(user);
-        return Result.sucess("修改成功！");
+        return Result.success("修改成功！");
     }
 
     /**
@@ -56,7 +56,7 @@ public class UserController {
     @DeleteMapping("/delete/{id}")
     public Result delete(@PathVariable Integer id) {
         userService.deleteUser(id);
-        return Result.sucess();
+        return Result.success();
     }
 
     /**
@@ -65,7 +65,7 @@ public class UserController {
     @DeleteMapping("/delete/batch")
     public Result batch(@RequestBody List<Integer> ids) {
         userService.batchDeleteUser(ids);
-        return Result.sucess();
+        return Result.success();
     }
 
     /**
@@ -74,7 +74,7 @@ public class UserController {
     @GetMapping("/selectAll")
     public Result selectAll() {
         List<User> userList = userService.selectAll();
-        return Result.sucess(userList);
+        return Result.success(userList);
     }
 
     /**
@@ -83,7 +83,7 @@ public class UserController {
     @GetMapping("/selectById/{id}")
     public Result selectById(@PathVariable Integer id) {
         User user  = userService.selectById(id);
-        return Result.sucess(user);
+        return Result.success(user);
     }
 
     /**
@@ -94,7 +94,7 @@ public class UserController {
     @GetMapping("/selectByName/{name}")
     public Result selectByName(@PathVariable String name) {
         List<User> userList = userService.selectByName(name);
-        return Result.sucess(userList);
+        return Result.success(userList);
     }
 
     /**
@@ -103,7 +103,7 @@ public class UserController {
     @GetMapping("/selectByMore")
     public Result selectByMore(@RequestParam String username, @RequestParam String name) {
         List<User> userList = userService.selectByMore(username,name);
-        return Result.sucess(userList);
+        return Result.success(userList);
     }
 
 
@@ -113,7 +113,7 @@ public class UserController {
     @GetMapping("/selectByBlur")
     public Result selectByBlur(@RequestParam String username, @RequestParam String name) {
         List<User> userList = userService.selectByBlur(username,name);
-        return Result.sucess(userList);
+        return Result.success(userList);
     }
 
     /**
@@ -125,6 +125,6 @@ public class UserController {
                                @RequestParam Integer pageSize,
                                @RequestParam String username, @RequestParam String name) {
         Page<User> page = userService.selectByPage(pageNum, pageSize, username, name);
-        return Result.sucess(page);
+        return Result.success(page);
     }
 }

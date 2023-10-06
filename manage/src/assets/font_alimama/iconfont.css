@@ -1,8 +1,8 @@
 @font-face {
   font-family: "element-icons"; /* Project id 4245434 */
-  src: url('iconfont.woff2?t=1694425431488') format('woff2'),
-       url('iconfont.woff?t=1694425431488') format('woff'),
-       url('iconfont.ttf?t=1694425431488') format('truetype');
+  src: url('iconfont.woff2?t=1696943102376') format('woff2'),
+       url('iconfont.woff?t=1696943102376') format('woff'),
+       url('iconfont.ttf?t=1696943102376') format('truetype');
 }
 
 .element-icons {
@@ -13,7 +13,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.el-icon-guangbo:before {
+.el-icon-vaildcode:before {
+  content: "\e605";
+}
+
+.el-icon-broadcast:before {
   content: "\e673";
 }
 
