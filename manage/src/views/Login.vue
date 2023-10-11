@@ -1,4 +1,10 @@
 <template>
+  <transition
+      name="animate__animated animate__bounce"
+      enter-active-class="animate__rollIn"
+      leave-active-class="animate__rollOut"
+      appear
+  >
   <div class="base">
     <!-- 注册登录界面 -->
     <div  class="loginAndRegist">
@@ -23,23 +29,35 @@
         >
           <!-- 密码框和用户名框 -->
           <div v-show="isShow" :model="loginUser" class="pwdArea">
-            <div style="flex: 1;justify-content: center;display: flex;align-items: center;">
-              <el-input prefix-icon="el-icon-user" class="username" v-model="loginUser.name" style="width: 165px"  placeholder="用户名"></el-input>
+            <el-form :model="loginUser" :rules="rules" ref="UserLoginRef" class="pwdArea">
+              <el-form-item prop="username">
+            <div style="flex: 1;justify-content: center;display: flex;align-items: center; margin-top: 20px">
+              <el-input prefix-icon="el-icon-user" class="username" v-model="loginUser.username"  style="width: 165px"
+                        placeholder="用户名"></el-input>
             </div>
-            <div style="flex: 1;justify-content: center;display: flex;align-items: center">
-              <el-input prefix-icon="el-icon-lock" placeholder="密码"  v-model="loginUser.password" style="width: 165px" show-password></el-input>
+              </el-form-item>
+              <el-form-item prop="password">
+            <div style="flex: 1;justify-content: center;display: flex;align-items: center; margin-top: 20px">
+              <el-input prefix-icon="el-icon-lock" placeholder="密码"  v-model="loginUser.password" style="width: 165px"
+                        prop="password" show-password></el-input>
             </div>
-            <div style="flex: 1;justify-content: center;display: flex;align-items: center">
-              <el-popover trigger="click" placement="top" prop="validCode">
+              </el-form-item>
+
+              <el-form-item prop="code">
+            <div style="flex: 1;justify-content: center;display: flex;align-items: center; margin-top: 20px">
+              <el-popover trigger="click" placement="top">
                 <div slot="reference">
-                  <el-input prefix-icon="el-icon-vaildcode" placeholder="验证码"  v-model="loginUser.code" style="width: 165px;" >
+                  <el-input prefix-icon="el-icon-vaildcode" placeholder="验证码"  v-model="loginUser.code"
+                            style="width: 165px;" >
                   </el-input>
                 </div>
-                  <valid-code v-model="code" @update:value="getCode"/>
+                <div>
+                <valid-code @update:value="getCode" />
+                </div>
               </el-popover>
-
-
             </div>
+              </el-form-item>
+            </el-form>
           </div>
         </transition>
         <transition
@@ -55,7 +73,7 @@
                          border-radius: 30px !important;
                          " @click="UserLogin">
                 登录</el-button>
-              <div style="margin-top: 10px;margin-right: -285px; cursor: pointer ">
+              <div style="margin-top: 10px;margin-right: -285px; cursor: pointer " @click="$router.push('/forgetpwd')">
               <span class="span_a">忘记密码</span>
               </div>
             </div>
@@ -84,8 +102,10 @@
         >
           <!--            注册表单-->
           <div  v-show="!isShow" class="registForm">
-            <div style="flex: 1;display: flex;justify-content: center;align-items: center">
+            <el-form class="el-registForm" :model="regUser" :rules="rules" ref="RegistUserRef">
+            <div style="flex: 1;display: flex;justify-content: center;align-items: center;margin-top: 18px">
               用&nbsp;&nbsp;&nbsp;户&nbsp;&nbsp;&nbsp;名:
+              <el-form-item prop="regUsername" style="margin-top: 20px">
               <el-input
                   placeholder="请输入用户名"
                   v-model="regUser.regUsername"
@@ -93,28 +113,36 @@
                   clearable
               >
               </el-input>
+              </el-form-item>
             </div>
-            <div style="flex: 1;display: flex;justify-content: center;align-items: center">
+            <div style="flex: 1;display: flex;justify-content: center;align-items: center ">
               密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码:
+              <el-form-item prop="regPwd" style="margin-top: 20px">
               <el-input placeholder="请输入密码" style="width: 165px;margin-left: 10px" v-model="regUser.regPwd" show-password></el-input>
+              </el-form-item>
             </div>
-            <div style="flex: 1;display: flex;justify-content: center;align-items: center;">
+            <div style="flex: 1;display: flex;justify-content: center;align-items: center ">
               确&nbsp;认&nbsp;密&nbsp;码:
-              <el-input placeholder="请再次输入密码" style="width: 165px;margin-left: 10px" v-model="regUser.regRePwd" show-password></el-input>
+              <el-form-item prop="regRePwd" style="margin-top:20px">
+              <el-input placeholder="请确认密码" style="width: 165px;margin-left: 10px" v-model="regUser.regRePwd" show-password></el-input>
+              </el-form-item>
             </div>
             <div style="flex: 1;display: flex;align-items: center">
               管理员审核:
               <template>
+                <el-form-item  style="margin-top:20px">
                 <el-select id="elselect"  v-model="regUser.selectValue" filterable style="width: 100px;margin-left: 10px"  placeholder="请选择">
                   <el-option
                       v-for="item in admins"
                       :key="item.id"
-                      :label="item.nickname"
+                      :label="item.username"
                       :value="item.id">
                   </el-option>
                 </el-select>
+                </el-form-item>
               </template>
             </div>
+            </el-form>
           </div>
         </transition>
         <transition
@@ -189,12 +217,12 @@
     </div>
 
   </div>
+</transition>
 </template>
 
 <script>
 import 'animate.css';
 // eslint-disable-next-line no-unused-vars
-import request from "@/utils/request";
 import ValidCode from "@/ValidCode/ValidCode";
 export default {
   name:'Login',
@@ -202,16 +230,39 @@ export default {
     ValidCode
   },
   data() {
+
+
+    //验证码校验
+    const validateCode = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入验证码'))
+      } else if(value.toLowerCase() !== this.code) {
+        callback(new Error('验证码错误'))
+      } else {
+        callback()
+      }
+    }
+
+    //确认密码校验
+    const validatePwd = (rule, regRePwd, callback) => {
+      if (regRePwd === '') {
+        callback(new Error('请确认密码'))
+      } else if(regRePwd !== this.regUser.regPwd) {
+        callback(new Error('两次密码输入不同,请检查后重试！'))
+      } else {
+        callback()
+      }
+    }
+
+
     return {
       code: '', //验证码组件传过来的code
       loginUser: {
         code: "", //表单上用户输入的code
-        name: "",
+        username: "",
         password: ""
       },
-
-
-      admins:{},
+      admins:[],
       ////看看用不用转成用户对象
       regUser:{
         regUsername:'',
@@ -219,6 +270,40 @@ export default {
         regPwd:'',
         selectValue:"",
       },
+      rules:{
+        username: [
+          {
+            required: true, message:'请输入账号', trigger: 'blur'
+          },
+        ],
+        password: [
+          {
+            required: true, message:'请输入密码', trigger: 'blur'
+          },
+        ],
+        code: [
+          {
+            validator: validateCode, trigger:'blur'
+          }
+        ],
+        regUsername: [
+          {
+            required: true, message:'请输入用户名', trigger:'blur'
+          }
+        ],
+        regPwd: [
+          {
+            required:true, message:'请输入密码', trigger:'blur'
+          }
+        ],
+        regRePwd: [
+          {
+            validator:validatePwd,trigger:'blur'
+          }
+        ],
+      },
+
+
       styleObj:{
         bordertoprightradius:'15px',
         borderbottomrightradius: '15px',
@@ -253,29 +338,63 @@ export default {
     },
     //验证码验证
     getCode(code){
-      this.validCode = code; // 更新validCode的值
-      console.log(this.validCode); // 打印验证码的code值
+      this.code = code.toLowerCase() // 更新validCode的值
     },
     //用户登录
     UserLogin(){
-      // request.post("/user/login",this.loginUser).then(res=>{
-      //   if(res.code=="200"){
-      //     localStorage.setItem("user",JSON.stringify(res.data))
-      //     this.$message.success("登陆成功！")
-      //     this.$router.push("/manage")
-      //   }else if(res.code=="400"){
-      //     this.$message.warning(res.msg)
-      //   }else if(res.code=="401"){
-      //     this.$message.error(res.msg)
-      //   }
-      //   else{
-      //     this.$message.error("用户名或密码错误！")
-      //   }
-      // })
+      this.$refs['UserLoginRef'].validate((valid) => {
+        if (valid) {
+          // 验证通过
+          this.$request.post("/user/login", this.loginUser).then(res => {
+            if (res.code == "200") {
+              if (res.data.role === '管理员' || res.data.role === '超级管理员') {
+                localStorage.setItem("manage_config", JSON.stringify(res.data)) //存储用户数据
+                //根据不同时间段，插入不同的登录成功提示欢迎语
+                const currentTime = new Date();
+                const currentHour = currentTime.getHours();
+                let welcomeMessage = '';
+                let roleMessage = res.data.role.toString();
+                if (currentHour >= 5 && currentHour < 12) { // 8点到12点为上午
+                  welcomeMessage = '上午好！亲爱的'+ ' ' + roleMessage + '，' + '新的一天又开始了，请努力工作！';
+                } else if (currentHour >= 12 && currentHour < 18) { // 12点到18点为下午
+                  welcomeMessage = '下午好！亲爱的' + ' ' + roleMessage + '，' + '午休过后，请努力工作！';
+                } else if (currentHour >= 18 && currentHour < 24) {  // 18点到次日凌晨0点为晚上
+                  welcomeMessage = '晚上好！亲爱的' + ' ' + roleMessage + '，' + '工作完成后，请休息哦！';
+                } else  { // 0点到次日凌晨5点深夜
+                  welcomeMessage = '夜深了！亲爱的' + ' ' + roleMessage + '，' + '身体是革命的本钱，请注意休息哦！';
+                }
+                this.$message.success(welcomeMessage );
+                this.$router.push("/");
+              }
+                else {
+                this.$message.error("您没有管理员权限")
+              }
+            } else {
+              this.$message.error(res.msg)
+            }
+          })
+        }
+
+      })
+
+
+
+        // if(res.code=="200"){
+        //   localStorage.setItem("user",JSON.stringify(res.data))
+        //   this.$message.success("登陆成功！")
+        //   this.$router.push("/manage")
+        // }else if(res.code=="400"){
+        //   this.$message.warning(res.msg)
+        // }else if(res.code=="401"){
+        //   this.$message.error(res.msg)
+        // }
+        // else{
+        //   this.$message.error("用户名或密码错误！")
+        // }
     },
     //加载管理员信息
     loadInfoOfAdmin(){
-      this.request.get("/user/listOfAdmin").then(res=>{
+      this.$request.get("/user/listOfAdmin",this.admins).then(res=>{
         if(res.code=="200"){
           this.admins=res.data
           return true
@@ -284,32 +403,28 @@ export default {
     },
     //用户注册
     userRegister(){
-      if(this.regUser.regUsername===""){
-        this.$message.error("用户名不能为空！")
-        return false
-      }else if(this.regUser.regPwd!=this.regUser.regRePwd){
-        this.$message.error("两次密码输入不同，请检查后重新注册！")
-        return false
-      }else{
-        let user = {};
-        user.name = this.regUser.regUsername
-        user.password = this.regUser.regPwd
-        user.auditor = this.regUser.selectValue
-        this.request.post("/user/register",user).then(res=>{
-          if(res.code==="200"){
-            this.$message.success("申请成功，请耐心等待管理员审核！")
-            this.regUser={  regUsername:'',
-              regRePwd:'',
-              regPwd:'',
-              selectValue:""}
-            this.changeToLogin()
-          }
-          if(res.code==="400"){
-            this.$message.error(res.msg)
-            return
-          }
-        })
-      }
+      this.$refs['RegistUserRef'].validate((valid) =>{
+        if (valid){
+          let user = {};
+          user.username = this.regUser.regUsername
+          user.password = this.regUser.regPwd
+          user.role = '用户'
+            this.$request.post("/user/register",user).then(res=>{
+            if(res.code==="200"){
+              this.$message.success("申请成功，请耐心等待管理员审核！")
+              this.regUser={  regUsername:'',
+                regRePwd:'',
+                regPwd:'',
+                selectValue:''}
+              this.changeToLogin()
+            }
+            if(res.code==="500"){
+              this.$message.error(res.msg)
+              return
+            }
+          })
+        }
+      })
 
     }
   },
@@ -412,7 +527,6 @@ export default {
 }
 .pwdArea{
   width: 100%;
-  flex:2;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -457,9 +571,10 @@ flex: 2;
 display: flex;
 flex-direction: column;
 color: #041322;
-font-size: 16px;
 }
-
+.el-registForm{
+font-size: 14px;
+}
 .registForm input{
 outline: none;
 height: 30%;
@@ -483,7 +598,7 @@ align-items: center;
 .el-input__icon.el-icon-user,
 .el-input__icon.el-icon-lock,
 .el-input__icon.el-icon-vaildcode{
-   margin-top: 4px;
+   margin-top: 6px;
  }
 
 </style>

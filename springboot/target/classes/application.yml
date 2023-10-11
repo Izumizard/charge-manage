@@ -1,8 +1,22 @@
 server:
   port: 5700
+jasypt:
+  encryptor:
+    property:
+      prefix: ANC(
+      suffix: )
+      #测试演示用
+      password: easygo
+      #项目上线用
+      #password: ${JASYPT_ENCRYPTOR_PASSWORD}
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/charge_manage?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2b8
-    username: root
-    password: root
+    url: ANC(jjycvBxFkM6jXlVUCqUjUf3D4Tdsgo/wq0YaXS5Vg5DrpoaFiziPdYP5+cbgaCfwCGIU45XIrBpyTHB0LUoEFahGqTNZnuMYiJQwNzAbIvKlwTBVYkvgxrnF7rYowWj/+YnloorwUhCywa4O30joFRzQj6UEayiOX1Zn7ZdS51w=)
+    username: ANC(wLtYNUl9FKWaWi9pr8vaug==)
+    password: ANC(2H4S6y1D+sTJwhOqgaoeyA==)
+ip: localhost
+servlet:
+  multipart:
+    max-file-size: 200MB
+    max-request-size: 200MB

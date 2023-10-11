@@ -4,6 +4,7 @@ import com.example.springboot.common.Page;
 import com.example.springboot.entity.User;
 import com.example.springboot.exception.ServiceException;
 import com.example.springboot.mapper.UserMapper;
+import com.example.springboot.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -71,6 +72,10 @@ public class UserService {
         return page;
     }
 
+    //查询管理员
+    public List<User> selectByAdmin(String role) {
+        return userMapper.selectByAdmin(role);
+    }
 
     //验证用户账户是否合法
     public User login(User user) {
@@ -83,6 +88,21 @@ public class UserService {
        if (!user.getPassword().equals(dbUser.getPassword())){
            throw new ServiceException("用户名或密码错误");
        }
+        String token = TokenUtils.createToken(dbUser.getId().toString(),dbUser.getPassword());
+        dbUser.setToken(token);
         return dbUser;
     }
+
+    public User register(User user) {
+        User dbUser = userMapper.selectByUsername(user.getUsername());
+        if (dbUser != null){
+            //抛出一个自定义的异常
+            throw new ServiceException("用户名已存在");
+        }
+        //用户名即昵称
+        user.setName(user.getUsername());
+        userMapper.insert(user);
+        return user;
+    }
+
 }

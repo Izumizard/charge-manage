@@ -12,13 +12,13 @@ import java.util.List;
 @Mapper
 public interface UserMapper {
 
-    @Insert("insert into `user`(username,password,name,phone,email,address,avatar) " +
-            "values(#{username}, #{password}, #{name}, #{phone}, #{email},#{address}, #{avatar})")
+    @Insert("insert into `user`(username,password,name,phone,email,address,avatar,role) " +
+            "values(#{username}, #{password}, #{name}, #{phone}, #{email},#{address}, #{avatar}, #{role})")
     void insert(User user);
 
 
     @Update("update `user` set username = #{username},name = #{name},phone = #{phone}," +
-            " email = #{email}, address = #{address}, avatar = #{avatar} where id = #{id}")
+            " email = #{email}, address = #{address}, avatar = #{avatar}, role = #{role} where id = #{id}")
     void updateUser(User user);
 
 
@@ -26,7 +26,7 @@ public interface UserMapper {
     void deleteUser(Integer id);
 
 
-    @Select("select * from `user` order by id desc")
+    @Select("select * from `user` order by id")
     List<User> selectAll();
 
 
@@ -51,4 +51,7 @@ public interface UserMapper {
 
     @Select("select * from `user` where username = #{username} order by id desc")
     User selectByUsername(String username);
+
+    @Select("select id, name, username, role from `user` where role = '超级管理员' order by id desc")
+    List<User> selectByAdmin(String role);
 }

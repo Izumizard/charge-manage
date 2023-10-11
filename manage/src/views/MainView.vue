@@ -1,11 +1,25 @@
 <template>
+  <transition
+      name="animate__animated animate__bounce"
+      enter-active-class="animate__rollIn"
+      leave-active-class="animate__rollOut"
+      appear
+  >
   <div>
     <el-container>
       <!--   侧边栏  -->
+      <transition
+          name="animate__animated animate__bounce"
+          enter-active-class="animate__slideInUp"
+          leave-active-class="animate__slideOutDown"
+          appear
+      >
       <el-aside :width="asideWidth" style="min-height: 100vh; background-color:#011635;border-radius: 12px">
+
         <div style="height:60px; line-height:60px; color : white; display:flex;align-items:center;
         justify-content: center;">
           <!--  logo    -->
+
           <img src="@/assets/logo1.png" alt="" style="width: 40px; height: 40px;" />
           <span class="logo-title" v-show="!isCollapse">C.M.System</span>
         </div>
@@ -28,7 +42,7 @@
             <span slot="title">充电桩管理</span>
           </el-menu-item>
 
-          <el-menu-item index="/order">
+          <el-menu-item index="/orders">
             <i class="el-icon-wallet"></i>
             <span slot="title">订单管理</span>
           </el-menu-item>
@@ -42,13 +56,13 @@
             <el-menu-item index="/admininfo">管理员信息</el-menu-item>
           </el-submenu>
         </el-menu>
-
-
       </el-aside>
-
+      </transition>
 
       <el-container>
         <!--   头部区域  -->
+
+
         <el-header>
           <div class="box_bgd">
             <i :class="collapseIcon" style="font-size: 26px; align-items: center;" @click="handleCollapse"></i>
@@ -73,41 +87,93 @@
             </el-tabs>
           </div>
 
-
+        <transition
+            name="animate__animated animate__bounce"
+            enter-active-class="animate__slideInUp"
+            leave-active-class="animate__slideOutDown"
+            appear>
           <div style="flex: 1; width: 0; display: flex; align-items: center; justify-content: flex-end;">
             <el-dropdown placement="bottom">
               <div style="display: flex; align-items: center; cursor: default">
                 <img src="@/assets/img1.png" alt="" style="width: 40px; height: 40px; margin: 0 5px">
-                <span style="margin-left: 5px !important">管理员</span>
+                <span style="margin-left: 5px !important">{{user.username || "管理员" }}</span>
               </div>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item><i class="el-icon-admin" ></i>个人信息</el-dropdown-item>
-                <el-dropdown-item><i class="el-icon-edit"></i>修改密码</el-dropdown-item>
-                <el-dropdown-item @click=""><i class="el-icon-out"></i>退出登录</el-dropdown-item>
+                <el-dropdown-item @click.native="this.$router.push('/admininfo')">
+                  <i class="el-icon-admin"></i>个人信息</el-dropdown-item>
+                <el-dropdown-item @click.native="changeClick" name="changePwd">
+                  <i class="el-icon-edit"></i>修改密码</el-dropdown-item>
+                <el-dropdown-item @click.native="logout"><i class="el-icon-out"></i>退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </div>
+        </transition>
         </el-header>
-
         <!--  主体区域  -->
         <el-main>
 
-          <transition name="fade" mode="out-in">
+          <!--  悬浮设置按钮 -->
+          <div class="settingBtnStyle">
+            <button class="settingBtn" @click="gotoSetting">
+              <i class="el-icon-setting" style="font-size: 24px; color: #fff"></i>
+            </button>
+          </div>
+
+
             <keep-alive>
               <router-view v-if="$route.meta.keepAlive"></router-view>
             </keep-alive>
-          </transition>
-          <router-view v-if="!$route.meta.keepAlive"></router-view>
 
         </el-main>
+
       </el-container>
     </el-container>
   </div>
+</transition>
 </template>
 
 <script>
-
+import 'animate.css';
 import store from '../../src/store'
+
+window.onload = function() {
+  const settingBtnStyle = document.querySelector('.settingBtnStyle');
+  const settingBtn = document.querySelector('.settingBtn');
+
+  let isDragging = false;
+  let startY, currentY, offsetY;
+
+  settingBtnStyle.classList.add('hidden'); // 隐藏按钮
+  settingBtnStyle.addEventListener('mouseenter', () => {
+    settingBtnStyle.classList.remove('hidden'); // 鼠标进入按钮时移除隐藏样式
+  });
+
+  settingBtnStyle.addEventListener('mouseleave', () => {
+    if (!isDragging) {
+      settingBtnStyle.classList.add('hidden'); // 鼠标移出按钮时添加隐藏样式
+    }
+  });
+  settingBtn.addEventListener('mousedown', (e) => {
+    isDragging = true;
+
+    startY = e.clientY;
+    offsetY = settingBtnStyle.offsetTop;
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!isDragging) {
+      return;
+    }
+
+    currentY = e.clientY;
+    const distanceY = currentY - startY;
+    settingBtnStyle.style.top = `${offsetY + distanceY}px`;
+  });
+
+  window.addEventListener('mouseup', () => {
+    isDragging = false;
+  });
+}
+
 export default {
   name: "HomeView",
   data() {
@@ -115,9 +181,9 @@ export default {
       isCollapse: true, // 收缩
       asideWidth: "64px",
       collapseIcon: 'el-icon-s-unfold',
-
-
+      user:JSON.parse(localStorage.getItem('manage_config') || '{}'),
       activeTab: '',
+      activeName:'changePwd'
     }
   },
 
@@ -144,6 +210,21 @@ export default {
 
 
   methods: {
+    changeClick(event) {
+      const activeName = event.name;
+      this.$router.push({
+        path: `/admininfo?activeName=${activeName}`,
+      });
+    },
+    gotoSetting(){
+      this.$router.push('/admininfo' );
+    },
+    //退出登录并清理token和用户数据
+    logout(){
+      localStorage.removeItem('manage_config')
+      sessionStorage.removeItem('tabsView')
+      this.$router.push('/login')
+    },
     // 动态控制展开与收起和切换对应图标
     handleCollapse() {
       this.isCollapse = !this.isCollapse
@@ -220,6 +301,35 @@ export default {
 </script>
 
 <style>
+.settingBtnStyle {
+  position: fixed;
+  top: 50%;
+  right: 10px;
+  bottom: 20px;
+  z-index: 999;
+  justify-content: flex-end;
+  align-items: center;
+  transition: transform 0.6s ease-in-out; /* 增加过渡效果的持续时间 */
+}
+.settingBtn {
+  display: block;
+  width: 42px;
+  height: 42px;
+  border: none;
+  background-color: #409EFF;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  transition: all 0.3s ease-in-out;
+}
+.settingBtn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
+}
+.hidden {
+  transform: translateX(75%); /* 隐藏在侧边 */
+}
+
+
 .el-menu--inline{
   background-color: #041322 !important;
 }
@@ -257,6 +367,8 @@ export default {
   cursor: pointer;
   width: 40px;
   margin-top: 8px;
+  animation: bounce;
+  animation-duration: 2s;
 
 }
 .el-submenu .el-menu-item {

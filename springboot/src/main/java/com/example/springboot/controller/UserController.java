@@ -1,5 +1,7 @@
 package com.example.springboot.controller;
 
+import cn.hutool.core.util.StrUtil;
+import com.example.springboot.common.AuthAccess;
 import com.example.springboot.common.Page;
 import com.example.springboot.common.Result;
 import com.example.springboot.entity.User;
@@ -11,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 功能：
+ * 功能：User控制
  * 日期：2023/9/15 14:17
  */
 @RestController
@@ -71,6 +73,7 @@ public class UserController {
     /**
      * 查询全部用户信息
      */
+    @AuthAccess
     @GetMapping("/selectAll")
     public Result selectAll() {
         List<User> userList = userService.selectAll();
@@ -127,4 +130,42 @@ public class UserController {
         Page<User> page = userService.selectByPage(pageNum, pageSize, username, name);
         return Result.success(page);
     }
+
+    /**
+     *用户登录接口
+     */
+    @PostMapping("/login")
+    public Result login(@RequestBody User user) {
+        if (StrUtil.isBlank(user.getUsername()) || StrUtil.isBlank(user.getPassword())){
+            return Result.error("用户名或密码不能为空");
+        }
+        user = userService.login(user);
+        return  Result.success(user);
+    }
+
+    /**
+     *用户注册接口
+     */
+    @AuthAccess
+    @PostMapping("/register")
+    public Result register(@RequestBody User user) {
+        if (StrUtil.isBlank(user.getUsername()) || StrUtil.isBlank(user.getPassword())){
+            return Result.error("用户名或密码不能为空");
+        }
+        user = userService.register(user);
+        return  Result.success(user);
+    }
+
+    /**
+     *管理员查询接口
+     */
+    @AuthAccess
+    @GetMapping("/listOfAdmin")
+    public Result selectByAdmin(String role) {
+        List<User> userList = userService.selectByAdmin(role);
+        return Result.success(userList);
+    }
+
+
+
 }

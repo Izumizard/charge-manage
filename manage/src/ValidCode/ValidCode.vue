@@ -61,7 +61,7 @@ export default {
       // 指向
       this.codeList = codeList
       // 将当前数据派发出去
-      this.$emit('input', codeList.map(item => item.code).join(''))
+      this.$emit('update:value', codeList.map(item => item.code).join(''))
     },
     getStyle (data) {
       return `color: ${data.color}; font-size: ${data.fontSize}; padding: ${data.padding}; transform: ${data.transform}`
