@@ -39,7 +39,7 @@
 
           <el-menu-item  index="/chargemanage">
             <i class="el-icon-monitor"></i>
-            <span slot="title">充电桩管理</span>
+            <span slot="title">充电站管理</span>
           </el-menu-item>
 
           <el-menu-item index="/orders">
@@ -54,6 +54,7 @@
             </template>
             <el-menu-item index="/notice">通知信息</el-menu-item>
             <el-menu-item index="/admininfo">管理员信息</el-menu-item>
+            <el-menu-item index="/logs">系统日志</el-menu-item>
           </el-submenu>
         </el-menu>
       </el-aside>
@@ -136,7 +137,6 @@
 <script>
 import 'animate.css';
 import store from '../../src/store'
-
 window.onload = function() {
   const settingBtnStyle = document.querySelector('.settingBtnStyle');
   const settingBtn = document.querySelector('.settingBtn');

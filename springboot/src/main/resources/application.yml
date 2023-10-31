@@ -1,5 +1,7 @@
 server:
   port: 5700
+  tomcat:
+    max-swallow-size: 200MB #重要的一行，修改tomcat的吞吐量
 jasypt:
   encryptor:
     property:
@@ -15,6 +17,10 @@ spring:
     url: ANC(DDqWeg+t+wdc1Cg+tr+bY9MIFRFizK9tZmQhS54kQ4EEyWqnkt/oXyeDC7dUJsLYwSdJYF6Y8pmtTg76OFBlKiReqnGV/aB+UQJiFH/sRpUrkCvlxqkT0pwtoRDIEDPnE/uh6bMrjrsWbr+LHSacAl+S6oS9gjHsGSnU7hLKtnM=)
     username: ANC(Ytb4xDhtkG9HSXDFWvI/2g==)
     password: ANC(7zEMcH+sko7+o/fBBaNdGA==)
+  servlet:
+    multipart:
+      max-file-size: 200MB #单个文件最大
+      max-request-size: 200MB #单个请求文件总和最大
   mail:
     #    protocol: smtps
     protocol: smtp
@@ -30,8 +36,12 @@ spring:
     # 默认的邮件编码为UTF-8
     default-encoding: UTF-8
 ip: localhost
-servlet:
-  multipart:
-    max-file-size: 200MB
-    max-request-size: 200MB
 
+mybatis:
+  configuration:
+    mapUnderscoreToCamelCase: false
+
+mybatis-plus:
+  configuration:
+    mapUnderscoreToCamelCase: false
+  mapper-locations: classpath:**/*Mapper.xml

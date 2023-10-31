@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * 功能：File控制
+ * 功能：File上传、下载、导出
  * 日期：2023/10/14 19:07
  */
 
@@ -32,6 +32,9 @@ public class FileController {
     String port;
 
     private static final String ROOT_PATH = System.getProperty("user.dir") + File.separator +"files"; //文件存储目录 D:\vue\files
+    /**
+     * 用户上传接口
+     */
     @PostMapping("/upload")
     public Result upload(MultipartFile file) throws IOException {
         String originalFilename = file.getOriginalFilename(); //文件的原始名称
@@ -54,6 +57,10 @@ public class FileController {
         String url = "http://" + ip +":" + port + "/file/download/" + originalFilename ;
         return Result.success(url);//返回文件连接，这个连接就是文件的下载地址
     }
+
+    /**
+     * 用户下载接口
+     */
     @AuthAccess
     @GetMapping("/download/{fileName}")
     public void download(@PathVariable String fileName, HttpServletResponse response) throws IOException {

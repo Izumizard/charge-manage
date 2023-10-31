@@ -240,6 +240,7 @@
 <script>
 import 'animate.css';
 import ValidCode from "@/ValidCode/ValidCode";
+import {login, sendEmail, loadOfAdmin, resetPwd, userRegister} from "@/api/login";
 export default {
   name:'Login',
   components:{
@@ -373,19 +374,18 @@ export default {
     //获取验证码
     sendEmailCode(type) {
       let email;
-       if(type === 2) {
-        email = this.forgetUserForm.email
+      if (type === 2) {
+        email = this.forgetUserForm.email;
+      } else {
+        this.$message.warning("请输入邮箱账号");
+        return;
       }
-      if(!email) {
-        this.$message.warning("请输入邮箱账号")
-        return
-      }
-      if(!/^\w+((.\w+)|(-\w+))@[A-Za-z0-9]+((.|-)[A-Za-z0-9]+).[A-Za-z0-9]+$/.test(email)) {
-        this.$message.warning("请输入正确的邮箱账号")
-        return
+      if (!email || !/^\w+((.\w+)|(-\w+))@[A-Za-z0-9]+((.|-)[A-Za-z0-9]+).[A-Za-z0-9]+$/.test(email)) {
+        this.$message.warning("请输入正确的邮箱账号");
+        return;
       }
       // 发送邮箱验证码
-      this.$request.get("/user/email/" + email + "/" + type ).then(res => {
+      sendEmail(email, type).then(res => {
         if (res.code === '200') {
           this.$message.success("发送成功")
           this.startTimer()   // 发送验证码成功后开始倒计时
@@ -409,9 +409,9 @@ export default {
 
     //重置密码
     resetPwd(){
-      this.$request.put("/user/reset", this.forgetUserForm).then(res => {
+      resetPwd(this.forgetUserForm).then(res => {
         if (res.code === '200') {
-          this.$message.success("重置密码成功，新密码为：123，请尽快修改密码")
+          this.$message.success("重置密码成功，新密码为：123456，请尽快修改密码")
           this.forgetPwdDialoVisible = false
         } else {
           this.$message.error(res.msg)
@@ -427,7 +427,7 @@ export default {
       this.$refs['UserLoginRef'].validate((valid) => {
         if (valid) {
           // 验证通过
-          this.$request.post("/user/login", this.loginUser).then(res => {
+          login(this.loginUser).then(res => {
             if (res.code == "200") {
               if (res.data.role === '管理员' || res.data.role === '超级管理员') {
                 localStorage.setItem("manage_config", JSON.stringify(res.data)) //存储用户数据
@@ -456,27 +456,11 @@ export default {
             }
           })
         }
-
       })
-
-
-
-        // if(res.code=="200"){
-        //   localStorage.setItem("user",JSON.stringify(res.data))
-        //   this.$message.success("登陆成功！")
-        //   this.$router.push("/manage")
-        // }else if(res.code=="400"){
-        //   this.$message.warning(res.msg)
-        // }else if(res.code=="401"){
-        //   this.$message.error(res.msg)
-        // }
-        // else{
-        //   this.$message.error("用户名或密码错误！")
-        // }
     },
     //加载管理员信息
     loadInfoOfAdmin(){
-      this.$request.get("/user/listOfAdmin",this.admins).then(res=>{
+      loadOfAdmin(this.admins).then(res=>{
         if(res.code=="200"){
           this.admins=res.data
           return true
@@ -491,7 +475,7 @@ export default {
           user.username = this.regUser.regUsername
           user.password = this.regUser.regPwd
           user.role = '用户'
-            this.$request.post("/user/register",user).then(res=>{
+            userRegister(user).then(res=>{
             if(res.code==="200"){
               this.$message.success("申请成功，请耐心等待管理员审核！")
               this.regUser={  regUsername:'',

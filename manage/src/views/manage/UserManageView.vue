@@ -17,10 +17,16 @@
         >
         </el-switch>
       </el-tooltip>
-
+      <!-- 批量导入/导出 -->
+  <el-upload :action="$baseUrl + '/user/import'" :headers="{ token: user.token}"
+             :show-file-list="false"
+             :on-success="handleImport"
+             style="color: #fff; margin-right: 10px">
+    <el-button type="primary" icon="el-icon-upload2">批量导入</el-button>
+  </el-upload>
       <el-button type="primary" icon="el-icon-download" style="color: #fff" @click="exportData">批量导出</el-button>
       <!-- 新增/删除 -->
-    <el-button class="button_pr" type="primary"  icon="el-icon-plus" @click="handleAdd">新建用户</el-button>
+    <el-button class="button_pr" type="primary"  style="margin-right:0px !important" icon="el-icon-plus" @click="handleAdd">新建用户</el-button>
     <el-button type="danger" icon="el-icon-delete" style="color: #fff" @click="deleteBatch">批量删除</el-button>
     </div>
   </div>
@@ -167,14 +173,14 @@
             </el-select>
           </el-form-item>
           <el-form-item label="头像：">
-            <el-upload action="http://localhost:5700/file/upload"
+            <el-upload :action="$baseUrl + '/file/upload'"
                        :on-success="handleAvatarSuccess"
                        :headers="{token : user.token}"
                        :file-list="form.avatar? [form.avatar] : []"
                        list-type="picture"
                        style="line-height: 34px; height: 34px">
-              <el-button icon="el-icon-upload2" type="primary" plain>
-                更换头像
+              <el-button icon="el-icon-upload" type="primary" plain>
+                {{btnText}}
               </el-button>
             </el-upload>
           </el-form-item>
@@ -221,7 +227,7 @@
                 <span class="label-text">账户余额:</span>
               </div>
             </template>
-            <span>￥{{showRow.balance}}</span>
+            <span>￥{{showRow.amount}}</span>
           </el-form-item>
         </el-form>
         </div>
@@ -233,6 +239,8 @@
 
 <script>
 
+
+import {deleteBatch, deleteUser, loadUser, save} from "@/api/manage/userManage";
 
 export default {
   name: "UserManageView",
@@ -254,12 +262,11 @@ export default {
         label: '超级管理员', value: '超级管理员'
       }],
       dialogTitle: '',
-      loading: false,
+      btnText:'',
+      loading: true,
       Striped: false,
       fromVisible:false,
       showDialog: false, // 弹窗的显示与隐藏
-      adminPassword: "", // 超级管理员密码
-      popoverVisible: false, // 弹框是否可见
       user:JSON.parse(localStorage.getItem('manage_config') || "{}"),
       rules:{
         username: [
@@ -284,7 +291,7 @@ created() {
 
 },
 
-  mounted() {
+mounted() {
     // 在页面加载时从本地存储中读取选择状态
     const selection = localStorage.getItem('changeStriped');
     if (selection !== null) {
@@ -295,7 +302,20 @@ created() {
   methods: {
     exportData() {  //批量导出数据
       if(!this.ids.length){ //没有选择行的时候，全部导出，或者根据我的搜索条件导出
-
+        window.open(this.$baseUrl + '/user/export?token=' + this.user.token + "&username=" +
+        this.username)
+      } else{   //  [1, 2, 3] => '1,2,3'
+        let idStr = this.ids.join(',')
+        window.open(this.$baseUrl + '/user/export?token=' + this.user.token + '&ids=' + idStr)
+      }
+    },
+    handleImport(res, file ,fileList) {
+      if(res.code === '200') {
+        this.$message.success("导入成功！")
+        this.loading = false
+        this.load(1)
+      } else {
+        this.$message.error(res.msg)
       }
     },
     deleteBatch() {
@@ -308,10 +328,11 @@ created() {
               this.$message.error('删除失败！权限不足！')
               return;
             }
-            this.$request.delete('/user/delete/batch', { data:this.ids}).then(res => {
+            deleteBatch(this.ids).then(res => {
                   if (res.code === '200') {
                     this.$message.success('操作成功！')
-                    this.load()
+                    this.loading = false
+                    this.load(1)
                   } else {
                     this.$message.error(res.msg)
                   }
@@ -324,6 +345,7 @@ created() {
     },
     handleEdit(index, row) {  // 编辑数据
       this.dialogTitle = '编辑用户' //修改dialog标题
+      this.btnText = '更改头像'
       this.form = JSON.parse(JSON.stringify(row))  //给form对象赋值 注意要深拷贝数据
       this.fromVisible = true//打开弹窗
     },
@@ -334,7 +356,7 @@ created() {
               this.$message.error('删除失败！权限不足！')
               return;
             }
-            this.$request.delete('/user/delete/' + id)
+            deleteUser(id)
                 .then(res => {
                   if (res.code === '200') {
                     this.$message.success('操作成功！')
@@ -349,6 +371,7 @@ created() {
     handleAdd(){       //新增数据
       this.form = {}   //新增数据的时候清空数据
       this.dialogTitle = '新增用户' //修改dialog标题
+      this.btnText = '上传头像'
       this.fromVisible = true //打开弹窗
     },
     save() {  // 保存按钮触发的逻辑 它会触发新增或者更新
@@ -358,14 +381,11 @@ created() {
             if (this.form.role === '超级管理员' && this.user.role === '管理员') {
               this.$message.error('权限不足！')
             } else {
-              this.$request({
-                url: this.form.id ? '/user/update' : '/user/add',
-                method: this.form.id ? 'PUT' : 'POST',
-                data: this.form
-              }).then(res => {
+              save(this.form).then(res => {
                 if (res.code === '200') {
                   this.$message.success('保存成功')
                   this.load(1)
+                  this.loading = false
                   this.fromVisible = false
                 } else {
                   this.$message.error('保存失败')
@@ -376,14 +396,11 @@ created() {
             if (this.form.role === '超级管理员' || this.form.role === '管理员') {
               this.$message.error('权限不足！');
             } else {
-              this.$request({
-                url: this.form.id ? '/user/update' : '/user/add',
-                method: this.form.id ? 'PUT' : 'POST',
-                data: this.form
-              }).then(res => {
+              save(this.form).then(res => {
                 if (res.code === '200') {
                   this.$message.success('保存成功')
                   this.load(1)
+                  this.loading = false
                   this.fromVisible = false
                 } else {
                   this.$message.error('保存失败')
@@ -401,15 +418,11 @@ created() {
     },
     load(pageNum){
       if (pageNum) this.pageNum = pageNum
-      this.$request.get('/user/selectByPage', {
-        params: {
-          pageNum: this.pageNum,
-          pageSize: this.pageSize,
-          username:this.username
-        }
-      }).then(res => {
+      loadUser(this.pageNum, this.pageSize, this.username, this.name)
+        .then(res => {
         this.users = res.data.records
         this.total = res.data.total
+        this.loading = false
       })
     },
     handleCurrentChange(pageNum) {
@@ -431,25 +444,7 @@ created() {
         this.showDialog = true;
       }
     },
-    clickSeePassword() {
-      if (this.showPassword) {
-        this.showPassword = false;
-        this.adminPassword = ""; // 关闭密码显示时清空超级管理员密码
-      } else {
-        // 如果未输入超级管理员密码，则弹出确认框
-        if (!this.adminPassword) {
-          this.popoverVisible = true;
-        } else if (this.adminPassword === "admin123") {
-          this.showPassword = true;
-        }
-      }
-    },
-    confirmAdminPassword() {
-      if (this.adminPassword === "admin123") {
-        this.showPassword = true;
-      }
-      this.popoverVisible = false;
-    },
+
   },
 };
 
@@ -559,15 +554,5 @@ created() {
 .label-text {
   margin-left: 5px;
 }
-.password-container {
-  position: relative;
-}
-.password-icon {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  color: #c0c4cc;
-  cursor: pointer;
-}
+
 </style>

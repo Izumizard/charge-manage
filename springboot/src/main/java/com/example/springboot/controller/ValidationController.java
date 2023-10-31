@@ -14,7 +14,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 功能：
+ * 功能：验证码控制
  * 日期：2023/10/26 15:43
  */
 @RestController

@@ -10,6 +10,7 @@ import NoticeManageView from "@/views/systemManage/NoticeManageView";
 import { MessageBox } from 'element-ui';
 import 'element-ui/lib/theme-chalk/message-box.css'
 import login from "@/views/Login";
+import LogsView from "@/views/systemManage/LogsView";
 
 
 
@@ -55,7 +56,7 @@ const routes = [
         meta:{
           keepAlive:true,
           comp:ChargeManageView,
-          title:'充电桩管理'
+          title:'充电站管理'
           }
         },
       {
@@ -88,6 +89,16 @@ const routes = [
           title:'管理员信息'
           }
         },
+      {
+        path:'logs',
+        name: 'logs',
+        component:LogsView,
+        meta:{
+          keepAlive:true,
+          comp:LogsView,
+          title:'系统日志'
+        }
+      },
     ]
   },
   {
@@ -119,28 +130,27 @@ styleNode.innerHTML = `
 document.head.appendChild(styleNode); // 将style标签添加到head标签中
 
 // 路由导航守卫
-// router.beforeEach((to,form,next)=>{
+router.beforeEach((to,form,next)=>{
   /**
    * to 将要访问的路径
    *  from 代表从哪个路径跳转来的
    *  next 函数 表示放行
    */
-//   let token;
-//   token = window.localStorage.getItem('manage_config');
-//   if (to.path !== '/login' && !token) {
-//     MessageBox.alert('请登录！', '提示', {
-//       confirmButtonText: '确定',
-//       type: 'error',
-//       showClose:false,
-//       customClass:"login-message",
-//       callback: () => {
-//         next('/login');
-//       },
-//     });
-//   } else {
-//     next();
-//   }
-// })
+  let token = localStorage.getItem('manage_config');
+  if (to.path !== '/login' && !token) {
+    MessageBox.alert('请登录！', '提示', {
+      confirmButtonText: '确定',
+      type: 'error',
+      showClose:false,
+      customClass:"login-message",
+      callback: () => {
+        next('/login');
+      },
+    });
+  } else {
+    next();
+  }
+})
 
 
 export default router

@@ -14,7 +14,7 @@
               :src="user.avatar ||'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png'"
               style="width: 160px; height: 160px; border-radius: 8px"
               ></el-image>
-            <el-upload action="http://localhost:5700/file/upload"
+            <el-upload :action="$baseUrl + '/file/upload'"
                        :on-success="handleAvatarSuccess"
                        :headers="{token : user.token}"
                        :show-file-list="false"
@@ -86,6 +86,8 @@
 </template>
 
 <script>
+import {updateUser} from "@/api/systemManage/adminstrator";
+
 export default {
   data() {
     const validatePwd = (rule, value, callback) => {
@@ -147,7 +149,7 @@ export default {
         if (valid){
           this.user.password = this.user.newPwd
           //保存当前的用户信息到数据库
-          this.$request.put('/user/update',this.user).then(res =>{
+          updateUser(this.user).then(res =>{
             if (res.code === '200') {
               //成功更新
               this.$message.success('密码已更改！')
@@ -161,12 +163,12 @@ export default {
     },
     update(){
       //保存当前的用户信息到数据库
-      this.$request.put('/user/update',this.user).then(res =>{
+      updateUser(this.user).then(res =>{
         if (res.code === '200') {
           //成功更新
           this.$message.success('资料已更新！')
           //更新浏览器缓存里的用户信息
-      localStorage.setItem('manage_config', JSON.stringify(this.user))
+          localStorage.setItem('manage_config', JSON.stringify(this.user))
 
           //触发父级更新
           this.$emit('update:user', this.user)

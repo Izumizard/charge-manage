@@ -6,9 +6,9 @@
     <i class="el-icon-broadcast" style="margin-right: 5px"></i> 本系统仅供内部测试使用，不做商业用途。
   </div>
   <div class="carousel_cl" style="padding: 10px 20px; margin-bottom: 20px;">
-    <el-carousel indicator-position="outside" :height="banH +'px'">
-      <el-carousel-item v-for="item in 4" :key="item">
-
+    <el-carousel indicator-position="outside" :height="banH +'px'" >
+      <el-carousel-item v-for="item in items" :key="item">
+        <img :src="item" alt="banner">
       </el-carousel-item>
     </el-carousel>
   </div>
@@ -16,22 +16,30 @@
 </template>
 
 <script>
+import {eventBus} from "@/main";
+import {swiper} from "@/api/manage/home";
 export default {
   name: "HomeView",
   data(){
     return{
+      items:[],
       banH:300,
     }
   },
-
+  created() {
+    eventBus.$on('updateBanner', () => {
+      swiper().then(response => {
+        this.items =  response.data.filter(item => item.status).map(item =>item.banner)
+      })
+    })
+  },
   methods: {
 
     setbanH() {
 
       this.banH = 250
 
-    }
-
+    },
   },
 
   mounted() {
@@ -43,7 +51,9 @@ export default {
       this.setbanH()
 
     }, false)
-
+    swiper().then(response => {
+      this.items =  response.data.filter(item => item.status).map(item =>item.banner)
+    })
   },
 
 

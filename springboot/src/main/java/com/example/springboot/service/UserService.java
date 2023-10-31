@@ -7,9 +7,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.springboot.common.ValidationEnum;
+import com.example.springboot.entity.Balance;
 import com.example.springboot.entity.User;
 import com.example.springboot.entity.Validation;
 import com.example.springboot.exception.ServiceException;
+import com.example.springboot.mapper.BalanceMapper;
 import com.example.springboot.mapper.UserMapper;
 import com.example.springboot.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,16 +23,15 @@ import org.thymeleaf.context.Context;
 
 import javax.annotation.Resource;
 import javax.mail.internet.MimeMessage;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 
 import static com.example.springboot.common.Contants.CODE_600;
 
 
 /**
  * 功能：封装对用户信息进行持久化操作的方法
- * 新增：发送邮箱验证码
+ * 新增：发送邮箱验证码、查询管理员信息
  * 日期：2023/9/14 21:38
  */
 @Service
@@ -38,7 +39,8 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 
     @Resource
     UserMapper userMapper;
-
+    @Resource
+    BalanceMapper balanceMapper;
     @Override
     public boolean save(User entity) {
         if (StrUtil.isBlank(entity.getName())) {
@@ -50,6 +52,13 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         if (StrUtil.isBlank(entity.getRole())) {
             entity.setRole("用户");  // 默认角色：用户
         }
+        if (super.save(entity) && "用户".equals(entity.getRole())) {
+            // 如果用户角色为“用户”，在余额表中创建对应的记录并将金额设为 0
+            Balance balance = new Balance();
+            balance.setUserId(entity.getId()); // 设置用户ID
+            balance.setAmount(BigDecimal.ZERO); // 设置余额初始值为 0
+            balanceMapper.insert(balance); // 插入余额记录
+        }
         return super.save(entity);
     }
 
@@ -60,6 +69,13 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         //根据用户名查询数据库的用户信息
         return getOne(queryWrapper);  // select * from user where username = #{username}
     }
+
+    public User selectById(Integer id) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id",id);
+        return getOne(queryWrapper);
+    }
+
     public List<User> selectByBlur(String username, String name) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.like(StringUtils.isNotBlank(username), "username", username)
@@ -124,9 +140,9 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         return userMapper.selectList(queryWrapper);
     }
 
-
+    @Resource BalanceService balanceService;
     //验证用户账户是否合法
-    public User login(User user) {
+    public Map<String, Object> login(User user) {
        User dbUser = selectByUsername(user.getUsername());
        if (dbUser == null){
            //抛出一个自定义的异常
@@ -135,9 +151,18 @@ public class UserService extends ServiceImpl<UserMapper, User> {
        if (!user.getPassword().equals(dbUser.getPassword())){
            throw new ServiceException("用户名或密码错误");
        }
+        Balance balance = balanceService.selectByUserId(dbUser.getId());
+        BigDecimal userBalance = (balance != null) ? balance.getAmount() : BigDecimal.ZERO;
+
+
+        // 将余额信息存储到用户对象中
         String token = TokenUtils.createToken(dbUser.getId().toString(),dbUser.getPassword());
         dbUser.setToken(token);
-        return dbUser;
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("user", dbUser);
+        result.put("balance", userBalance);
+        return result;
     }
 
     public User register(User user) {
@@ -146,11 +171,16 @@ public class UserService extends ServiceImpl<UserMapper, User> {
             //抛出一个自定义的异常
             throw new ServiceException("用户名已存在");
         }
+        user.setRole("用户");  // 默认角色：用户
         //用户名即昵称
         user.setName(user.getUsername());
         userMapper.insert(user);
+        // 在 balance 表中为新用户创建余额信息（默认为零）
+        Balance balance = new Balance();
+        balance.setUserId(user.getId());
+        balance.setAmount(BigDecimal.ZERO);
+        balanceMapper.insert(balance);
         return user;
     }
-
 
 }

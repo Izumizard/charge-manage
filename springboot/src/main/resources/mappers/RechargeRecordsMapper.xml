@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.RechargeRecordsMapper">
+
+    <resultMap id="baseMapper" type="com.example.springboot.entity.RechargeRecords" autoMapping="true">
+        <id column="id" property="id"/>
+        <result column="user_id" property="user_id"/>
+        <result column="user_username" property="user_username"/>
+        <result column="recharge" property="recharge"/>
+        <result column="number" property="number"/>
+        <result column="type" property="type"/>
+        <result column="status" property="status"/>
+        <result column="recharge_time" property="recharge_time"/>
+        <result column="avatar" property="avatar"/>
+        <!-- 其他属性映射 -->
+    </resultMap>
+
+    <select id="selectByUser_username" resultMap="baseMapper">
+        SELECT rr.*, IFNULL(NULLIF(TRIM(u.avatar), ''), 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png') as avatar
+        FROM recharge_records rr
+        LEFT JOIN user u ON rr.user_id = u.id
+        <where>
+            <if test="user_username != null and user_username != ''">
+                rr.user_username = #{user_username}
+            </if>
+        </where>
+        ORDER BY rr.id DESC
+    </select>
+
+
+
+</mapper>

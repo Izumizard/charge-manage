@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 功能：
+ * 功能：封装对验证码信息进行持久化操作的方法
  * 日期：2023/10/23 18:43
  */
 @Service
