@@ -12,11 +12,26 @@ jasypt:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ANC(jjycvBxFkM6jXlVUCqUjUf3D4Tdsgo/wq0YaXS5Vg5DrpoaFiziPdYP5+cbgaCfwCGIU45XIrBpyTHB0LUoEFahGqTNZnuMYiJQwNzAbIvKlwTBVYkvgxrnF7rYowWj/+YnloorwUhCywa4O30joFRzQj6UEayiOX1Zn7ZdS51w=)
-    username: ANC(wLtYNUl9FKWaWi9pr8vaug==)
-    password: ANC(2H4S6y1D+sTJwhOqgaoeyA==)
+    url: ANC(DDqWeg+t+wdc1Cg+tr+bY9MIFRFizK9tZmQhS54kQ4EEyWqnkt/oXyeDC7dUJsLYwSdJYF6Y8pmtTg76OFBlKiReqnGV/aB+UQJiFH/sRpUrkCvlxqkT0pwtoRDIEDPnE/uh6bMrjrsWbr+LHSacAl+S6oS9gjHsGSnU7hLKtnM=)
+    username: ANC(Ytb4xDhtkG9HSXDFWvI/2g==)
+    password: ANC(7zEMcH+sko7+o/fBBaNdGA==)
+  mail:
+    #    protocol: smtps
+    protocol: smtp
+    # 配置 SMTP 服务器地址
+    host: smtp.qq.com
+    # 发送者邮箱
+    username: 723791523@qq.com
+    # 配置密码，注意不是真正的密码，而是刚刚申请到的授权码
+    password: ANC(U5hF6Jgkwo69Ln3Ir+RK2xeCF74wd8U9j8E0NHqTzr8=)
+    # 端口号465或587
+    #    port: 465
+    port: 587
+    # 默认的邮件编码为UTF-8
+    default-encoding: UTF-8
 ip: localhost
 servlet:
   multipart:
     max-file-size: 200MB
     max-request-size: 200MB
+

@@ -10,49 +10,76 @@
           <div class="userImageSpan">用户头像</div>
           <div style="height: 160px; margin-bottom: 12px">
             <el-image
-              style="width: 150px; height: 150px; border-radius: 12px"
-              src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg"
-              fit="fill"
-            ></el-image>
+              :model="user"
+              :src="user.avatar ||'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png'"
+              style="width: 160px; height: 160px; border-radius: 8px"
+              ></el-image>
+            <el-upload action="http://localhost:5700/file/upload"
+                       :on-success="handleAvatarSuccess"
+                       :headers="{token : user.token}"
+                       :show-file-list="false"
+                       list-type="picture"
+                       style="line-height: 34px; height: 34px; margin-top: 30px">
+              <el-button icon="el-icon-upload2" type="primary" plain>
+                更换头像
+              </el-button>
+            </el-upload>
           </div>
-          <el-upload action="" style="line-height: 34px; height: 34px;margin-top: 150px">
-            <el-button icon="el-icon-upload2" type="primary" plain
-                       >更换头像</el-button>
-          </el-upload>
+
+
         </div>
         <!-- 用户设置表单 -->
         <div class="userSettingForm">
-        <el-form :model="user" label-width="80px" >
+        <el-form :model="user" label-width="80px" class="settingform" style="margin-top: 30px">
           <el-form-item label="用户名：" prop="username">
-            <span>{{user.username}}</span>
+            <span  style="display: flex; justify-content: center; font-size: 18px">{{user.username}}</span>
           </el-form-item>
           <el-form-item label="姓名：" prop="name">
-            <el-input v-model="user.name"></el-input>
+            <el-input v-model="user.name"  placeholder="姓名"></el-input>
           </el-form-item>
             <el-form-item label="电话：" prop="phone">
-              <el-input v-model="user.phone"></el-input>
+              <el-input v-model="user.phone"  placeholder="电话"></el-input>
             </el-form-item>
             <el-form-item label="邮箱：" prop="email">
-              <el-input v-model="user.email"></el-input>
+              <el-input v-model="user.email" placeholder="邮箱"></el-input>
             </el-form-item>
             <el-form-item label="地址：" prop="address">
-              <el-input v-model="user.address"></el-input>
+              <el-input type="textarea" v-model="user.address" placeholder="居住地址"></el-input>
             </el-form-item>
-            <el-form-item>
-              <el-button type="primary" icon="el-icon-check">提交</el-button>
-            </el-form-item>
+            <div style="display: flex; justify-content: center;margin-top: 30px">
+              <el-button type="primary" icon="el-icon-check"
+                         style="margin-right: 580px"
+                         @click="update">保 存</el-button>
+            </div>
           </el-form>
         </div>
       </div>
     </el-tab-pane>
 
-    <el-tab-pane label="修改密码" name="changePwd">
+    <el-tab-pane label="修改密码" name="changePwd" >
+
       <!-- 标头 -->
       <div class="settingStyleTitle">修改密码</div>
-    </el-tab-pane>
-    <el-tab-pane label="账号绑定" name="accountBind">
-      <!-- 标头 -->
-      <div class="settingStyleTitle">账号绑定</div>
+
+      <!-- 修改密码  -->
+      <div class="pwdChangeStyle">
+        <el-form :model="user" label-width="80px" class="pwdSettingForm" :rules="rules" ref="changePwdRef">
+          <el-form-item label="当前密码：" prop="password" style="margin-top:30px; width: 350px">
+            <el-input show-password   placeholder="当前密码"></el-input>
+          </el-form-item>
+          <el-form-item label="新密码：" prop="newPwd" style="margin-top:10px; width: 350px">
+            <el-input show-password v-model="user.newPwd"  placeholder="新密码"></el-input>
+          </el-form-item>
+          <el-form-item label="确认密码：" prop="confirmPwd" style="margin-top:10px; width: 350px">
+            <el-input show-password v-model="user.confirmPwd"  placeholder="确认密码"></el-input>
+          </el-form-item>
+          <div style="margin-top: 30px;margin-bottom: 20px">
+            <el-button type="primary" icon="el-icon-check"
+                       style=""
+                       @click="confirm">确 认</el-button>
+          </div>
+        </el-form>
+      </div>
     </el-tab-pane>
   </el-tabs>
 </div>
@@ -61,25 +88,110 @@
 <script>
 export default {
   data() {
-
+    const validatePwd = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请确认密码'))
+      } else if(value !== this.user.newPwd) {
+        callback(new Error('两次密码输入不同,请检查后重试！'))
+      } else if (value === this.user.password) {
+        callback(new Error('新密码不能与当前密码一致'));
+      }else {
+        callback()
+      }
+    }
+    const validateNewPwd = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请确认新密码'))
+      } else if (value === this.user.password) {
+        callback(new Error('新密码不能与当前密码一致'));
+      } else {
+        callback();
+      }
+    }
     return{
       activeName:'myInfo',
-      user:JSON.parse(localStorage.getItem('manage_config') || "{}")
+      user:JSON.parse(localStorage.getItem('manage_config') || "{}"),
+
+      rules: {
+        password: [
+          {
+            required: true, message:'请输入当前密码', trigger: 'blur'
+          },
+          ],
+        newPwd: [
+          {
+            validator: validateNewPwd, required:true, trigger: 'blur'
+          },
+          {
+            min: 6, max: 20, message: '密码长度太短', trigger: 'blur'
+          }
+        ],
+        confirmPwd: [
+          {
+            validator: validatePwd, required: true, trigger: 'blur'
+          },
+          {
+            min: 6, max: 20, message: '密码长度太短', trigger: 'blur'
+          }
+        ],
+      }
     }
   },
-  mounted(){
-    this.showtabs();//跳转到指定tab
-  },
+
   methods: {
-    //获取当前点击下标
-    showtabs() {
-      // 比较结果activeName的值
-      if (this.$route.query.activeName != null) {
-        this.activeName = this.$route.query.activeName;
+    handleAvatarSuccess(response, file, fileList){
+      this.user.avatar = response.data
+    },
+    confirm(){
+      this.$refs.changePwdRef.validate((valid) =>{
+        if (valid){
+          this.user.password = this.user.newPwd
+          //保存当前的用户信息到数据库
+          this.$request.put('/user/update',this.user).then(res =>{
+            if (res.code === '200') {
+              //成功更新
+              this.$message.success('密码已更改！')
+              this.$router.push('/login')
+            } else{
+              this.$message.error(res.msg)
+            }
+          })
+        }
+      })
+    },
+    update(){
+      //保存当前的用户信息到数据库
+      this.$request.put('/user/update',this.user).then(res =>{
+        if (res.code === '200') {
+          //成功更新
+          this.$message.success('资料已更新！')
+          //更新浏览器缓存里的用户信息
+      localStorage.setItem('manage_config', JSON.stringify(this.user))
+
+          //触发父级更新
+          this.$emit('update:user', this.user)
+        } else{
+          this.$message.error(res.msg)
+        }
+      })
+    },
+  },
+  created() {
+    const tab = this.$route.query.tab;
+    if (tab) {
+      this.activeName = tab;
+    }
+  },
+
+  watch: {
+    '$route.query.tab'(tab) {
+      if (tab) {
+        this.activeName = tab;
       }
     }
   }
-};
+}
+
 
 </script>
 
@@ -136,6 +248,32 @@ export default {
   border-radius: 12px;
   width: 100%;
 }
+.pwdChangeStyle {
+  text-align: left;
+  border: 1px solid #ebeef5;
+  padding: 16px;
+  border-radius: 12px;
+  width: 80%;
+  margin: 0 auto;
+}
+.pwdSettingForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/deep/.el-form-item__label {
+  white-space: nowrap;
+}
+.el-input--small .el-input__inner {
+  height: 32px;
+  line-height: 150px;
+  width: 300px;
+}
+.el-form-item {
+  margin-bottom: 80px;
+}
 .userSettingForm .el-form-item {
   line-height: 50px;
   max-width: 460px;
@@ -154,11 +292,16 @@ export default {
   font-size: 16px;
   font-weight: 500;
 }
+
 .el-image{
-  margin-top: 120px;
+  margin-top: 70px;
 }
 .el-button{
   border-radius: 12px !important;
 }
-
+/deep/.el-input__inner,
+/deep/.el-textarea__inner {
+  border-radius: 8px !important;
+  overflow: hidden;
+}
 </style>

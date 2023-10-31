@@ -2,12 +2,8 @@ package com.example.springboot.controller;
 
 import com.example.springboot.common.AuthAccess;
 import com.example.springboot.common.Result;
-import com.example.springboot.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-
-import javax.annotation.Resource;
 
 /**
  * 功能：提供接口返回数据

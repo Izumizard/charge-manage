@@ -73,7 +73,7 @@
                          border-radius: 30px !important;
                          " @click="UserLogin">
                 登录</el-button>
-              <div style="margin-top: 10px;margin-right: -285px; cursor: pointer " @click="$router.push('/forgetpwd')">
+              <div style="margin-top: 10px;margin-right: -285px; cursor: pointer"  @click="handleForgetPwd">
               <span class="span_a">忘记密码</span>
               </div>
             </div>
@@ -214,15 +214,31 @@
           </div>
         </transition>
       </div>
-    </div>
 
+    </div>
+    <el-dialog title="忘记密码"  :visible.sync="forgetPwdDialoVisible" class="reset-dialog">
+      <el-form :model="forgetUserForm" label-width="80px" style="padding-right: 20px">
+        <el-form-item label="邮箱">
+          <el-input size="medium" style="width: 350px" v-model="forgetUserForm.email" autocomplete="off" placeholder="请输入电子邮箱"></el-input>
+        </el-form-item>
+        <el-form-item label="验证码">
+          <el-input size="medium"  style="width: 200px" v-model="forgetUserForm.code"  placeholder="请输入验证码"></el-input>
+          <el-button type="primary" size="small" style="margin-left: 50px"
+                     :disabled="isCountingDown"
+                     @click="sendEmailCode(2)">{{ isCountingDown ? remainingTime + 's' : '获取验证码' }}</el-button>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer" style="margin-top: 25px">
+        <el-button @click="forgetPwdDialoVisible = false" style="margin-right: 10px">取 消</el-button>
+        <el-button type="primary" @click="resetPwd">重置密码</el-button>
+      </div>
+    </el-dialog>
   </div>
 </transition>
 </template>
 
 <script>
 import 'animate.css';
-// eslint-disable-next-line no-unused-vars
 import ValidCode from "@/ValidCode/ValidCode";
 export default {
   name:'Login',
@@ -256,12 +272,20 @@ export default {
 
 
     return {
+      forgetUserForm:{  //忘记密码表单数据
+
+      },
+      isCountingDown:false,
+      remainingTime: 0,   // 剩余时间
+      countdownTimer: null, // 倒计时计时器
+      forgetPwdDialoVisible:false,
       code: '', //验证码组件传过来的code
       loginUser: {
         code: "", //表单上用户输入的code
         username: "",
         password: ""
       },
+
       admins:[],
       ////看看用不用转成用户对象
       regUser:{
@@ -294,11 +318,17 @@ export default {
         regPwd: [
           {
             required:true, message:'请输入密码', trigger:'blur'
+          },
+          {
+            min: 6, max: 20, message: '密码长度太短', trigger: 'blur'
           }
         ],
         regRePwd: [
           {
             validator:validatePwd,trigger:'blur'
+          },
+          {
+            min: 6, max: 20, message: '密码长度太短', trigger: 'blur'
           }
         ],
       },
@@ -335,6 +365,58 @@ export default {
       this.styleObj.borderbottomleftradius='0px'
       this.styleObj.rightDis='0px'
       this.isShow = !this.isShow
+    },
+    handleForgetPwd(){   //初始化表单的数据
+      this.forgetUserForm = {}
+      this.forgetPwdDialoVisible = true
+    },
+    //获取验证码
+    sendEmailCode(type) {
+      let email;
+       if(type === 2) {
+        email = this.forgetUserForm.email
+      }
+      if(!email) {
+        this.$message.warning("请输入邮箱账号")
+        return
+      }
+      if(!/^\w+((.\w+)|(-\w+))@[A-Za-z0-9]+((.|-)[A-Za-z0-9]+).[A-Za-z0-9]+$/.test(email)) {
+        this.$message.warning("请输入正确的邮箱账号")
+        return
+      }
+      // 发送邮箱验证码
+      this.$request.get("/user/email/" + email + "/" + type ).then(res => {
+        if (res.code === '200') {
+          this.$message.success("发送成功")
+          this.startTimer()   // 发送验证码成功后开始倒计时
+        } else {
+          this.$message.error(res.msg)
+        }
+      })
+    },
+    startTimer() {
+      this.isCountingDown = true  // 开始倒计时
+      this.remainingTime = 60     // 设置倒计时时间为 60 秒
+      this.countdownTimer = setInterval(() => {
+        if (this.remainingTime > 0) {
+          this.remainingTime--
+        } else {
+          clearInterval(this.countdownTimer)   // 停止倒计时器
+          this.isCountingDown = false           // 将 isCountingDown 属性设置为 false
+        }
+      }, 1000)
+    },
+
+    //重置密码
+    resetPwd(){
+      this.$request.put("/user/reset", this.forgetUserForm).then(res => {
+        if (res.code === '200') {
+          this.$message.success("重置密码成功，新密码为：123，请尽快修改密码")
+          this.forgetPwdDialoVisible = false
+        } else {
+          this.$message.error(res.msg)
+        }
+      })
     },
     //验证码验证
     getCode(code){
@@ -600,5 +682,13 @@ align-items: center;
 .el-input__icon.el-icon-vaildcode{
    margin-top: 6px;
  }
+.el-input--medium .el-input__inner {
+   border-radius: 12px !important;
+ }
 
+.reset-dialog .el-dialog {
+  width: 30% !important;
+  height: 38% !important;
+  border-radius: 12px !important;
+}
 </style>

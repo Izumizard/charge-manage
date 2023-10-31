@@ -32,8 +32,6 @@ public class FileController {
     String port;
 
     private static final String ROOT_PATH = System.getProperty("user.dir") + File.separator +"files"; //文件存储目录 D:\vue\files
-
-
     @PostMapping("/upload")
     public Result upload(MultipartFile file) throws IOException {
         String originalFilename = file.getOriginalFilename(); //文件的原始名称
@@ -54,7 +52,7 @@ public class FileController {
         File saveFile = new File(ROOT_PATH + File.separator + originalFilename);
         file.transferTo(saveFile); // 存储文件到本地磁盘里去
         String url = "http://" + ip +":" + port + "/file/download/" + originalFilename ;
-        return Result.success(url); //返回文件连接，这个连接就是文件的下载地址
+        return Result.success(url);//返回文件连接，这个连接就是文件的下载地址
     }
     @AuthAccess
     @GetMapping("/download/{fileName}")

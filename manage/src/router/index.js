@@ -55,7 +55,7 @@ const routes = [
         meta:{
           keepAlive:true,
           comp:ChargeManageView,
-          title:'充电管理'
+          title:'充电桩管理'
           }
         },
       {
@@ -88,7 +88,6 @@ const routes = [
           title:'管理员信息'
           }
         },
-
     ]
   },
   {

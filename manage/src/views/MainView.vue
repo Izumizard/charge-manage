@@ -47,7 +47,7 @@
             <span slot="title">订单管理</span>
           </el-menu-item>
 
-          <el-submenu>
+          <el-submenu  index="">
             <template slot="title">
               <i class="el-icon-setting"></i>
               <span>系统设置</span>
@@ -95,15 +95,15 @@
           <div style="flex: 1; width: 0; display: flex; align-items: center; justify-content: flex-end;">
             <el-dropdown placement="bottom">
               <div style="display: flex; align-items: center; cursor: default">
-                <img src="@/assets/img1.png" alt="" style="width: 40px; height: 40px; margin: 0 5px">
+                <img :src="user.avatar || 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png'" alt="" style="width: 40px; height: 40px; margin: 0 5px;
+                border-radius: 12px;
+                overflow: hidden">
                 <span style="margin-left: 5px !important">{{user.username || "管理员" }}</span>
               </div>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item @click.native="this.$router.push('/admininfo')">
-                  <i class="el-icon-admin"></i>个人信息</el-dropdown-item>
-                <el-dropdown-item @click.native="changeClick" name="changePwd">
-                  <i class="el-icon-edit"></i>修改密码</el-dropdown-item>
-                <el-dropdown-item @click.native="logout"><i class="el-icon-out"></i>退出登录</el-dropdown-item>
+                <el-dropdown-item @click.native="myInfoClick"><i class="el-icon-admin"></i>个人信息</el-dropdown-item>
+                <el-dropdown-item @click.native="ChangePwdClick" ><i class="el-icon-edit" ></i>修改密码</el-dropdown-item>
+                <el-dropdown-item  @click.native="logout"><i class="el-icon-out"></i><span>退出登录</span></el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </div>
@@ -121,8 +121,9 @@
 
 
             <keep-alive>
-              <router-view v-if="$route.meta.keepAlive"></router-view>
+              <router-view v-if="$route.meta.keepAlive" @update:user="updateUser"></router-view>
             </keep-alive>
+
 
         </el-main>
 
@@ -143,31 +144,35 @@ window.onload = function() {
   let isDragging = false;
   let startY, currentY, offsetY;
 
-  settingBtnStyle.classList.add('hidden'); // 隐藏按钮
-  settingBtnStyle.addEventListener('mouseenter', () => {
-    settingBtnStyle.classList.remove('hidden'); // 鼠标进入按钮时移除隐藏样式
-  });
+  if (settingBtnStyle) {
+    settingBtnStyle.classList.add('hidden'); // 隐藏按钮
+    settingBtnStyle.addEventListener('mouseenter', () => {
+      settingBtnStyle.classList.remove('hidden'); // 鼠标进入按钮时移除隐藏样式
+    });
 
-  settingBtnStyle.addEventListener('mouseleave', () => {
-    if (!isDragging) {
-      settingBtnStyle.classList.add('hidden'); // 鼠标移出按钮时添加隐藏样式
-    }
-  });
-  settingBtn.addEventListener('mousedown', (e) => {
-    isDragging = true;
+    settingBtnStyle.addEventListener('mouseleave', () => {
+      if (!isDragging) {
+        settingBtnStyle.classList.add('hidden'); // 鼠标移出按钮时添加隐藏样式
+      }
+    });
+    settingBtn.addEventListener('mousedown', (e) => {
+      isDragging = true;
 
-    startY = e.clientY;
-    offsetY = settingBtnStyle.offsetTop;
-  });
-  window.addEventListener('mousemove', (e) => {
-    if (!isDragging) {
-      return;
-    }
+      startY = e.clientY;
+      offsetY = settingBtnStyle.offsetTop;
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) {
+        return;
+      }
 
-    currentY = e.clientY;
-    const distanceY = currentY - startY;
-    settingBtnStyle.style.top = `${offsetY + distanceY}px`;
-  });
+      currentY = e.clientY;
+      const distanceY = currentY - startY;
+      settingBtnStyle.style.top = `${offsetY + distanceY}px`;
+    });
+
+  }
+
 
   window.addEventListener('mouseup', () => {
     isDragging = false;
@@ -175,7 +180,8 @@ window.onload = function() {
 }
 
 export default {
-  name: "HomeView",
+  name: "MainView",
+  inject: ['reload'],
   data() {
     return {
       isCollapse: true, // 收缩
@@ -183,7 +189,6 @@ export default {
       collapseIcon: 'el-icon-s-unfold',
       user:JSON.parse(localStorage.getItem('manage_config') || '{}'),
       activeTab: '',
-      activeName:'changePwd'
     }
   },
 
@@ -210,20 +215,29 @@ export default {
 
 
   methods: {
-    changeClick(event) {
-      const activeName = event.name;
-      this.$router.push({
-        path: `/admininfo?activeName=${activeName}`,
-      });
+    updateUser(user){      //获取子组件传过来的数据，更新当前页面的数据
+      this.user = JSON.parse(JSON.stringify(user))    //让父级的对象跟子级的对象毫无关联
+    },
+    myInfoClick(){
+      this.$router.push({path: '/admininfo', query:{ tab:'myInfo'}});
+    },
+    ChangePwdClick() {
+      this.$router.push({ path: '/admininfo', query: { tab: 'changePwd' } });
     },
     gotoSetting(){
-      this.$router.push('/admininfo' );
+      this.reload();
     },
     //退出登录并清理token和用户数据
     logout(){
-      localStorage.removeItem('manage_config')
-      sessionStorage.removeItem('tabsView')
-      this.$router.push('/login')
+      localStorage.clear()
+      sessionStorage.clear()
+      this.$message({
+        message:"您已成功退出管理系统！",
+        type:"success"
+      })
+      setTimeout( () =>{
+        this.$router.push('/login')
+      },3000)
     },
     // 动态控制展开与收起和切换对应图标
     handleCollapse() {
@@ -250,35 +264,30 @@ export default {
       this.$router.push({path: name})
     },
     // 删除tab
-    removeTab(target) {
-      let active = this.activeTab;
+    async removeTab(target) {
       const tabs = this.tabList;
-
-      // 查找目标标签页的索引
       const index = tabs.findIndex((tab) => tab.path === target);
 
       if (index !== -1) {
-        // 移除目标标签页
         tabs.splice(index, 1);
 
         if (tabs.length === 0) {
           // 如果标签页列表为空，则跳转到首页
-          this.$router.push('/home');
-        } else if (active === target) {
-          // 删除当前激活的标签页时，将活跃标签页切换到上一个或下一个标签页
-          const nextTab = tabs[index] || tabs[index - 1];
-          if (nextTab) {
-            active = nextTab.path;
-          } else {
-            active = '/home'; // 如果没有上一个或下一个标签页，则将首页设为活跃标签页
-          }
+          await this.$router.push('/home');
+        } else if (target === this.activeTab) {
+          // 删除当前激活的标签页时，将活跃标签页切换到上一个标签页
+          const prevTab = tabs[Math.max(index - 1, 0)];
+          this.activeTab = prevTab.path;
+          await this.$router.push(prevTab.path);
         }
+
+        store.state.tabList = tabs.filter((tab) => tab.path !== target);
       }
 
-      // 更新当前激活的选项卡和选项卡列表
-      this.activeTab = active;
-      store.state.tabList = tabs.filter((tab) => tab.path !== target);
+      // 返回一个空的 Promise，以便遗留下的事件处理程序能够正常执行
+      return Promise.resolve();
     },
+
     // 解决刷新数据丢失问题
     beforeRefresh() {
       window.addEventListener('beforeunload', () => {
