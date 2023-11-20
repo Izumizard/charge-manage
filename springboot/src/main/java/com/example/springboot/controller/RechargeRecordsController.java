@@ -6,7 +6,7 @@ import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.springboot.common.Result;
+import com.example.springboot.common.config.Result;
 import com.example.springboot.entity.RechargeRecords;
 import com.example.springboot.service.RechargeRecordsService;
 import org.springframework.web.bind.annotation.*;

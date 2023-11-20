@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.springboot.common.ValidationEnum;
+import com.example.springboot.common.enums.ValidationEnum;
 import com.example.springboot.entity.Balance;
 import com.example.springboot.entity.User;
 import com.example.springboot.entity.Validation;
@@ -26,7 +26,7 @@ import javax.mail.internet.MimeMessage;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static com.example.springboot.common.Contants.CODE_600;
+import static com.example.springboot.common.constants.Contants.CODE_600;
 
 
 /**
@@ -41,6 +41,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     UserMapper userMapper;
     @Resource
     BalanceMapper balanceMapper;
+
     @Override
     public boolean save(User entity) {
         if (StrUtil.isBlank(entity.getName())) {
@@ -82,6 +83,8 @@ public class UserService extends ServiceImpl<UserMapper, User> {
                 .like(StringUtils.isNotBlank(name), "name", name);
         return userMapper.selectList(queryWrapper);
     }
+
+
     @Resource
     private ValidationService validationService;
     @Resource

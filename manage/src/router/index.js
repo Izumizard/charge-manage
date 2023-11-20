@@ -56,7 +56,7 @@ const routes = [
         meta:{
           keepAlive:true,
           comp:ChargeManageView,
-          title:'充电站管理'
+          title:'站点管理'
           }
         },
       {

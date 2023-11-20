@@ -12,3 +12,16 @@ export function updateUser(data){
         data: data
     });
 }
+
+/**
+ * 上传用户头像接口
+ * @param formData
+ * @returns {*}
+ */
+export function  uploadAvatar(formData){
+    return request({
+        url: '/file/upload',
+        method: 'post',
+        data: formData
+    })
+}

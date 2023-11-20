@@ -2,8 +2,8 @@ package com.example.springboot.controller;
 
 
 import cn.hutool.core.io.FileUtil;
-import com.example.springboot.common.AuthAccess;
-import com.example.springboot.common.Result;
+import com.example.springboot.common.annotations.AuthAccess;
+import com.example.springboot.common.config.Result;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

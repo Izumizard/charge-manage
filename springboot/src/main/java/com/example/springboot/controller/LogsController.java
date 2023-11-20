@@ -3,7 +3,7 @@ package com.example.springboot.controller;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.springboot.common.Result;
+import com.example.springboot.common.config.Result;
 import com.example.springboot.entity.Logs;
 import com.example.springboot.service.LogsService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,6 +2,7 @@ server:
   port: 5700
   tomcat:
     max-swallow-size: 200MB #重要的一行，修改tomcat的吞吐量
+#jasypt加密
 jasypt:
   encryptor:
     property:
@@ -12,6 +13,14 @@ jasypt:
       #项目上线用
       #password: ${JASYPT_ENCRYPTOR_PASSWORD}
 spring:
+  # rabbitmq配置
+  rabbitmq:
+    host: localhost
+    virtual-host: /
+    username: root
+    password: 123456
+    port: 5672
+  # 数据源配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ANC(DDqWeg+t+wdc1Cg+tr+bY9MIFRFizK9tZmQhS54kQ4EEyWqnkt/oXyeDC7dUJsLYwSdJYF6Y8pmtTg76OFBlKiReqnGV/aB+UQJiFH/sRpUrkCvlxqkT0pwtoRDIEDPnE/uh6bMrjrsWbr+LHSacAl+S6oS9gjHsGSnU7hLKtnM=)
@@ -36,11 +45,11 @@ spring:
     # 默认的邮件编码为UTF-8
     default-encoding: UTF-8
 ip: localhost
-
+# mybatis配置
 mybatis:
   configuration:
     mapUnderscoreToCamelCase: false
-
+# mybatis-plus配置
 mybatis-plus:
   configuration:
     mapUnderscoreToCamelCase: false

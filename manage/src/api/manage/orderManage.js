@@ -46,7 +46,4 @@ export function loadRechargeRecords(pageNum, pageSize, user_username) {
             user_username: user_username
         }
     })
-
-
-
 }

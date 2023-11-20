@@ -3,7 +3,7 @@ package com.example.springboot.service.aop;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ArrayUtil;
-import com.example.springboot.common.MessageLogs;
+import com.example.springboot.common.annotations.MessageLogs;
 import com.example.springboot.entity.Logs;
 import com.example.springboot.entity.User;
 import com.example.springboot.service.LogsService;

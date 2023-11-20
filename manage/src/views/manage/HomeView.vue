@@ -1,6 +1,5 @@
 <template>
   <div>
-
   <div style="box-shadow: 0 0 10px rgba(0,0,0,.1); padding:10px 20px; border-radius: 8px; margin-bottom: 20px;
   background-color: white">
     <i class="el-icon-broadcast" style="margin-right: 5px"></i> 本系统仅供内部测试使用，不做商业用途。
@@ -12,21 +11,39 @@
       </el-carousel-item>
     </el-carousel>
   </div>
+    <div style="display: flex">
+    <el-card style="width: 31%">
+      <div style="margin-bottom: 15px; font-size: 24px; font-weight: bold">系统公告</div>
+      <el-collapse v-model="activeName" accordion>
+        <el-collapse-item v-for="(item, index) in notices" :key="item.id"  :name="index + ''">
+          <template slot="title">
+            <h4>{{ item.title }}</h4>
+            <p style="margin-left:5px">-</p>
+            <p style="margin-left: 5px; font-weight: 350">{{item.time}}</p>
+          </template>
+          <p>{{ item.content }}</p>
+        </el-collapse-item>
+      </el-collapse>
+    </el-card></div>
   </div>
 </template>
 
 <script>
 import {eventBus} from "@/main";
-import {swiper} from "@/api/manage/home";
+import {notice, swiper} from "@/api/manage/home";
+
 export default {
   name: "HomeView",
   data(){
     return{
       items:[],
       banH:300,
+      notices: [],
+      activeName: '0'
     }
   },
   created() {
+    this.loadNotice()
     eventBus.$on('updateBanner', () => {
       swiper().then(response => {
         this.items =  response.data.filter(item => item.status).map(item =>item.banner)
@@ -34,12 +51,14 @@ export default {
     })
   },
   methods: {
-
     setbanH() {
-
       this.banH = 250
-
     },
+    loadNotice() {
+      notice().then(res => {
+        this.notices = res.data
+      })
+    }
   },
 
   mounted() {
@@ -63,7 +82,7 @@ export default {
 <style scoped>
 .carousel_cl{
   width: 512px;
-  height: 400px;
+  height: 300px;
 }
 ::v-deep .el-carousel__container {
   border-radius: 8px;

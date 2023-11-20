@@ -1,6 +1,6 @@
 package com.example.springboot.exception;
 
-import com.example.springboot.common.Result;
+import com.example.springboot.common.config.Result;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;

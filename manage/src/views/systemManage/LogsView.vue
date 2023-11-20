@@ -32,32 +32,15 @@
       box-shadow: none !important;"
           v-loading="loading"
           @selection-change="handleSelectionChange"
-          element-loading-text="正在加载数据"
+          element-loading-text="正在加载数据中..."
           element-loading-spinner="el-icon-loading"
           element-loading-background="rgba(0, 0,0, 0.6)"
       >
-        <el-table-column
-            type="selection"
-            width="55"
-            align="center"
-        >
-        </el-table-column>
+        <el-table-column type="selection" width="55" align="center"></el-table-column>
 
-        <el-table-column
-            label="ID"
-            width="55"
-            prop="id"
-            align="center">
-        </el-table-column>
-        <el-table-column
-            label="操作模块"
-            prop="operation"
-            align="center">
-        </el-table-column>
-        <el-table-column
-            label="操作类型"
-            prop="type"
-            align="center">
+        <el-table-column label="ID" width="55" prop="id" align="center"></el-table-column>
+        <el-table-column label="操作模块" prop="operation" align="center"></el-table-column>
+        <el-table-column label="操作类型" prop="type" align="center">
           <template v-slot="scope">
             <el-tag type="priamry" v-if="scope.row.type === '新增' ">{{scope.row.type}}</el-tag>
             <el-tag type="priamry" v-if="scope.row.type === '查询' ">{{scope.row.type}}</el-tag>
@@ -69,29 +52,12 @@
             <el-tag type="success" v-if="scope.row.type === '充值' ">{{scope.row.type}}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column
-            label="操作人IP"
-            prop="ip"
-            align="center">
-        </el-table-column>
-        <el-table-column
-            label="操作人"
-            prop="user"
-            align="center">
-        </el-table-column>
-        <el-table-column
-            label="操作时间"
-            prop="time"
-            align="center"
-        >
-        </el-table-column>
+        <el-table-column label="操作人IP" prop="ip" align="center"></el-table-column>
+        <el-table-column label="操作人" prop="user" align="center"></el-table-column>
+        <el-table-column label="操作时间" prop="time" align="center"></el-table-column>
         <el-table-column align="center" width="180">
           <template slot="header" slot-scope="scope">
-            <el-input
-                v-model="operation"
-                size="medium"
-                @input="load(1)"
-                placeholder="输入关键字搜索">
+            <el-input v-model="operation" size="medium" @input="load(1)" placeholder="输入关键字搜索">
               <i slot="prefix" class="el-input__icon el-icon-search"></i>
             </el-input>
           </template>
@@ -101,12 +67,7 @@
 
           <template slot-scope="scope" class="button-container" style=" display: flex; align-items: center">
 
-            <el-button
-                size="small"
-                type="danger"
-                plain
-                slot="reference"
-                class="deleteBtn"
+            <el-button size="small" type="danger" plain slot="reference" class="deleteBtn"
                 @click="handleDelete(scope.$index, scope.row.id);  $event.stopPropagation()">
               删 除</el-button>
           </template>
@@ -128,11 +89,9 @@
 </template>
 
 <script>
-
-
+import {deleteBatch, deleteLogs, loadLogs} from "@/api/systemManage/logsManage";
 export default {
   name: "LogsView",
-
   data() {
     return {
       tableData:[],
@@ -173,7 +132,7 @@ export default {
           this.$message.error('删除失败！权限不足！')
           return;
         }
-        this.$request.delete('/logs/delete/batch', { data:this.ids}).then(res => {
+        deleteBatch(this.ids).then(res => {
           if (res.code === '200') {
             this.$message.success('操作成功！')
             this.loading = false
@@ -196,7 +155,7 @@ export default {
               this.$message.error('删除失败！权限不足！')
               return;
             }
-            this.$request.delete('/logs/delete/' + id)
+            deleteLogs(id)
                 .then(res => {
                   if (res.code === '200') {
                     this.$message.success('操作成功！')
@@ -211,13 +170,7 @@ export default {
 
     load(pageNum){
       if (pageNum) this.pageNum = pageNum
-      this.$request.get('/logs/selectByPage', {
-        params: {
-          pageNum: this.pageNum,
-          pageSize: this.pageSize,
-          operation: this.operation
-        }
-      }).then(res => {
+      loadLogs(this.pageNum, this.pageSize, this.operation).then(res => {
         this.tableData = res.data.records
         this.total = res.data.total
         this.loading = false
@@ -315,17 +268,6 @@ export default {
 .button_pr:hover{
   background-color: rgba(22, 119, 255, 0.8) !important;
 }
-.userDialog{
-  height: 75% !important;
-  width: 25% !important;
-  border-radius: 12px !important;
-}
-.userManagerdialog{
-  width:20% !important;
-  height:60% !important;
-  border-radius: 12px !important;
-}
-
 /deep/.el-input--medium .el-input__inner {
   border-radius: 12px;
 }

@@ -1,7 +1,7 @@
 package com.example.springboot.controller;
 
-import com.example.springboot.common.AuthAccess;
-import com.example.springboot.common.Result;
+import com.example.springboot.common.annotations.AuthAccess;
+import com.example.springboot.common.config.Result;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

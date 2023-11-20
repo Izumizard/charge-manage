@@ -6,9 +6,13 @@ import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.springboot.common.*;
-import com.example.springboot.controller.DTO.UserDTO;
-import com.example.springboot.controller.DTO.UserPasswordDTO;
+import com.example.springboot.common.annotations.AuthAccess;
+import com.example.springboot.common.annotations.MessageLogs;
+import com.example.springboot.common.constants.Contants;
+import com.example.springboot.common.config.Result;
+import com.example.springboot.common.enums.LogType;
+import com.example.springboot.controller.dto.UserDTO;
+import com.example.springboot.controller.dto.UserPasswordDTO;
 import com.example.springboot.entity.Balance;
 import com.example.springboot.entity.User;
 import com.example.springboot.entity.Validation;
@@ -17,7 +21,6 @@ import com.example.springboot.service.BalanceService;
 import com.example.springboot.service.UserService;
 import com.example.springboot.service.ValidationService;
 import com.example.springboot.utils.TokenUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,7 +42,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
+    @Resource
     UserService userService;
     @Resource
     private BalanceService balanceService;
@@ -49,7 +52,6 @@ public class UserController {
     /**
      * 新增用户信息
      */
-    @AuthAccess
     @MessageLogs(operation = "用户信息", type = LogType.ADD)
     @PostMapping("/add")
     public Result add(@RequestBody User user) {
@@ -306,9 +308,7 @@ public class UserController {
         userQueryWrapper.eq("email", userPasswordDTO.getEmail());  //存根据email查询用户信息
         User user = userService.getOne(userQueryWrapper);
 
-        /**
-         * 重置密码
-         */
+        // 重置密码
         user.setPassword("123456");
         userService.updateById(user);
         return Result.success();

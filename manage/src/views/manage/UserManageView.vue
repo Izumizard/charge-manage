@@ -42,92 +42,37 @@
       v-loading="loading"
       @cell-click="openDetails"
       @selection-change="handleSelectionChange"
-      element-loading-text="正在加载用户数据"
+      element-loading-text="正在加载用户数据..."
       element-loading-spinner="el-icon-loading"
       element-loading-background="rgba(0, 0,0, 0.6)"
       >
-    <el-table-column
-        type="selection"
-        width="55"
-        align="center"
-    >
-    </el-table-column>
+    <el-table-column type="selection" width="55" align="center"></el-table-column>
 
-    <el-table-column
-        label="ID"
-        width="55"
-        prop="id"
-        align="center">
-    </el-table-column>
-    <el-table-column
-        label="头像"
-        prop="avatar"
-        align="center">
+    <el-table-column label="ID" width="55" prop="id" align="center"></el-table-column>
+    <el-table-column label="头像" prop="avatar" align="center">
       <template v-slot="scope">
-        <el-image
-            style="width: 50px; height: 50px;border-radius: 8px"
+        <el-image style="width: 50px; height: 50px;border-radius: 8px"
             v-if="scope.row.avatar" :src="scope.row.avatar"
         :preview-src-list="[scope.row.avatar]"
         @click="$event.stopPropagation()"></el-image>
       </template>
     </el-table-column>
-    <el-table-column
-        label="用户名"
-        prop="username"
-        align="center">
-    </el-table-column>
-    <el-table-column
-        label="姓名"
-        prop="name"
-        align="center">
-    </el-table-column>
-    <el-table-column
-        label="电子邮箱"
-        prop="email"
-        align="center">
-    </el-table-column>
-    <el-table-column
-        label="地址"
-        prop="address"
-        align="center"
-        show-overflow-tooltip
-    >
-    </el-table-column>
-    <el-table-column
-        label="角色权限"
-        prop="role"
-        align="center"
-    >
-    </el-table-column>
+    <el-table-column label="用户名" prop="username" align="center"></el-table-column>
+    <el-table-column label="姓名" prop="name" align="center"></el-table-column>
+    <el-table-column label="电子邮箱" prop="email" align="center"></el-table-column>
+    <el-table-column label="地址" prop="address" align="center" show-overflow-tooltip></el-table-column>
+    <el-table-column label="角色权限" prop="role" align="center"></el-table-column>
     <el-table-column align="center" width="180">
       <template slot="header" slot-scope="scope">
-        <el-input
-            v-model="username"
-            size="medium"
-            @input="load(1)"
-            placeholder="输入关键字搜索">
+        <el-input v-model="username" size="medium" @input="load(1)" placeholder="输入关键字搜索">
           <i slot="prefix" class="el-input__icon el-icon-search"></i>
         </el-input>
       </template>
-
-
-
-
       <template slot-scope="scope" class="button-container" style=" display: flex; align-items: center">
-        <el-button
-            size="small"
-            plain
-            class="editBtn"
-            @click="handleEdit(scope.$index, scope.row); $event.stopPropagation()">
+        <el-button size="small" plain class="editBtn" @click="handleEdit(scope.$index, scope.row); $event.stopPropagation()">
           编 辑</el-button>
-
-        <el-button
-            size="small"
-            type="danger"
-            plain
-            slot="reference"
-            class="deleteBtn"
-            @click="handleDelete(scope.$index, scope.row.id);  $event.stopPropagation()">
+        <el-button size="small" type="danger" plain slot="reference" class="deleteBtn" @click="handleDelete(scope.$index, scope.row.id);
+      $event.stopPropagation()">
           删 除</el-button>
       </template>
     </el-table-column>
@@ -265,7 +210,7 @@ export default {
       btnText:'',
       loading: true,
       Striped: false,
-      fromVisible:false,
+      fromVisible: false,
       showDialog: false, // 弹窗的显示与隐藏
       user:JSON.parse(localStorage.getItem('manage_config') || "{}"),
       rules:{
@@ -419,11 +364,20 @@ mounted() {
     load(pageNum){
       if (pageNum) this.pageNum = pageNum
       loadUser(this.pageNum, this.pageSize, this.username, this.name)
-        .then(res => {
-        this.users = res.data.records
-        this.total = res.data.total
-        this.loading = false
-      })
+          .then(res => {
+            if (res.data && res.data.records) {
+              this.users = res.data.records;
+              this.total = res.data.total;
+              this.loading = false;
+            } else {
+              // 处理返回数据为 null 的情况
+              console.error("数据为空");
+            }
+          })
+          .catch(error => {
+            // 添加错误处理逻辑
+            console.error("请求数据出错：", error);
+          });
     },
     handleCurrentChange(pageNum) {
       this.load(pageNum)

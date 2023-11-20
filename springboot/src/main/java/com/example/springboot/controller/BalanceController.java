@@ -1,9 +1,10 @@
 package com.example.springboot.controller;
 
-import com.example.springboot.common.LogType;
-import com.example.springboot.common.MessageLogs;
-import com.example.springboot.common.Result;
-import com.example.springboot.controller.DTO.RechargeRequest;
+import com.example.springboot.common.enums.LogType;
+import com.example.springboot.common.annotations.MessageLogs;
+import com.example.springboot.common.config.Result;
+import com.example.springboot.controller.dto.OrdersRequest;
+import com.example.springboot.controller.dto.RechargeRequest;
 import com.example.springboot.entity.Balance;
 import com.example.springboot.service.BalanceService;
 import com.example.springboot.service.RechargeRecordsService;
@@ -21,7 +22,7 @@ import java.math.BigDecimal;
 @RequestMapping("/balance")
 public class BalanceController {
 
-    @Autowired
+    @Resource
     BalanceService balanceService;
     @Resource
     RechargeRecordsService rechargeRecordsService;
@@ -35,7 +36,7 @@ public class BalanceController {
 
 
     @MessageLogs(operation = "余额信息", type = LogType.RESEARCH)
-    @GetMapping("/{userId}")
+    @GetMapping("/selectBalance/{userId}")
     public Result selectBalance(@PathVariable Integer userId){
         Balance balance = balanceService.selectByUserId(userId);
         if (balance == null) {
@@ -46,6 +47,13 @@ public class BalanceController {
         }
         return Result.success(balance.getAmount());
     }
+
+    @PostMapping("/payment")
+    public Result payment(@RequestBody OrdersRequest request) {
+        balanceService.deductBalance(request.getUser_id(), request.getPrice());
+        return Result.success("付款成功！");
+    }
+
 }
 
 

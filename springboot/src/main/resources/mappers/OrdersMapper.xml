@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.OrdersMapper">
+    <resultMap id="baseMapper" type="com.example.springboot.entity.Orders" autoMapping="true" />
+    <select id="getStationName" resultType="java.lang.String">
+        SELECT s.station_name
+        FROM charging_port p
+                 INNER JOIN charging_station s ON p.station_id = s.id
+        WHERE p.id = #{portId}
+    </select>
+    <select id="getInfo" resultMap="baseMapper">
+        SELECT o.id, o.order_no, cp.station_id,
+               IFNULL(u.avatar, 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png') AS avatar,
+               cp.port_number, cs.station_name, o.user_id,
+               o.port_id, o.start_time, o.end_time, o.status, o.duration,
+               o.create_time, o.update_time, o.price
+        FROM orders o
+                 LEFT JOIN charging_port cp ON o.port_id = cp.id
+                 LEFT JOIN user u ON o.user_id = u.id
+                 LEFT JOIN charging_station cs ON cp.station_id = cs.id
+        WHERE o.user_id = #{user_id}
+        ORDER BY o.id DESC
+    </select>
+
+
+</mapper>

@@ -240,7 +240,8 @@
 <script>
 import 'animate.css';
 import ValidCode from "@/ValidCode/ValidCode";
-import {login, sendEmail, loadOfAdmin, resetPwd, userRegister} from "@/api/login";
+import {loadOfAdmin, login, resetPwd, sendEmail, userRegister} from "@/api/login";
+
 export default {
   name:'Login',
   components:{

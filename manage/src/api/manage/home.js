@@ -10,3 +10,10 @@ export function swiper(){
         method: 'get'
     })
 }
+
+export function notice() {
+    return request({
+        url: '/notice/selectUserData',
+        method: 'get'
+    })
+}

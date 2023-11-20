@@ -5,13 +5,13 @@ import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.springboot.common.AuthAccess;
-import com.example.springboot.common.Result;
+import com.example.springboot.common.annotations.AuthAccess;
+import com.example.springboot.common.config.Result;
 import com.example.springboot.entity.Swiper;
 import com.example.springboot.service.SwiperService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/swiper")
 public class SwiperController {
 
-    @Autowired
+    @Resource
     SwiperService swiperService;
 
 
@@ -136,7 +136,7 @@ public class SwiperController {
         writer.write(list, true);
         // 设置浏览器响应的格式
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
-        response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode("轮播图", "UTF-8") + ".xlsx");
+        response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode("轮播图信息", "UTF-8") + ".xlsx");
         ServletOutputStream outputStream = response.getOutputStream();
         writer.flush(outputStream, true);
         writer.close();

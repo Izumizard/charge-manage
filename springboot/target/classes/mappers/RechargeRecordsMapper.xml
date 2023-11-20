@@ -16,7 +16,8 @@
     </resultMap>
 
     <select id="selectByUser_username" resultMap="baseMapper">
-        SELECT rr.*, IFNULL(NULLIF(TRIM(u.avatar), ''), 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png') as avatar
+        SELECT rr.*, IFNULL(NULLIF(TRIM(u.avatar), ''),
+        'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png') as avatar
         FROM recharge_records rr
         LEFT JOIN user u ON rr.user_id = u.id
         <where>
@@ -26,7 +27,6 @@
         </where>
         ORDER BY rr.id DESC
     </select>
-
 
 
 </mapper>

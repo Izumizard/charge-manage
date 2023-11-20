@@ -1,5 +1,5 @@
 <template>
-  <div class="userSettingStyle">
+  <div class="managerSettingStyle">
     <el-tabs tab-position="left" v-model="activeName">
       <el-tab-pane label="充值记录" name="rechargeRecords">
         <!-- 标头 -->
@@ -31,7 +31,7 @@
           </div>
         </div>
         <!-- 充值记录 -->
-        <div class="swpierInfoStyle">
+        <div class="recordsInfoStyle">
           <el-table
               :header-cell-style="{ backgroundColor: '#c3cde6', color:'#666'}"
               :data="rechargeRecords"
@@ -41,81 +41,31 @@
       box-shadow: none !important;"
               v-loading="loading"
               @selection-change="handleSelectionChange"
-              element-loading-text="正在加载数据"
+              element-loading-text="正在加载数据中..."
               element-loading-spinner="el-icon-loading"
               element-loading-background="rgba(0, 0,0, 0.6)"
           >
-            <el-table-column
-                type="selection"
-                width="55"
-                align="center"
-            >
-            </el-table-column>
+            <el-table-column type="selection" width="55" align="center"></el-table-column>
 
-            <el-table-column
-                label="ID"
-                width="55"
-                prop="id"
-                align="center">
-            </el-table-column>
-            <el-table-column
-                label="用户名"
-                prop="user_username"
-                align="center">
-            </el-table-column>
-            <el-table-column
-                label="用户头像"
-                prop="user_avatar"
-                align="center">
+            <el-table-column label="ID" width="55" prop="id" align="center"></el-table-column>
+            <el-table-column label="用户名" prop="user_username" align="center"></el-table-column>
+            <el-table-column label="用户头像" prop="user_avatar" align="center">
               <template v-slot="scope">
-                <el-image
-                    style="width: 50px; height: 50px;border-radius: 8px"
+                <el-image style="width: 50px; height: 50px;border-radius: 8px"
                     v-if="scope.row.avatar" :src="scope.row.avatar"
                     :preview-src-list="[scope.row.avatar]"
                     @click="$event.stopPropagation()"></el-image>
               </template>
             </el-table-column>
-            <el-table-column
-                label="充值金额"
-                prop="recharge"
-                align="center">
-            </el-table-column>
-            <el-table-column
-                label="订单号"
-                prop="number"
-                align="center"
-                width="178"
-                >
-            </el-table-column>
-            <el-table-column
-                label="支付方式"
-                prop="type"
-                align="center">
-            </el-table-column>
-            <el-table-column
-                label="充值状态"
-                prop="status"
-                align="center">
-            </el-table-column>
-            <el-table-column
-                label="充值时间"
-                prop="recharge_time"
-                align="center"
-                width="158">
-            </el-table-column>
-            <el-table-column align="center" width="180">
-
-
-
-
+            <el-table-column label="充值金额" prop="recharge" align="center"></el-table-column>
+            <el-table-column label="订单号" prop="number" align="center" width="178"></el-table-column>
+            <el-table-column label="支付方式" prop="type" align="center"></el-table-column>
+            <el-table-column label="充值状态" prop="status" align="center"></el-table-column>
+            <el-table-column label="充值时间" prop="recharge_time" align="center" width="158"></el-table-column>
+            <el-table-column label="操作" align="center" width="180">
               <template slot-scope="scope" class="button-container" style=" display: flex; align-items: center">
 
-                <el-button
-                    size="small"
-                    type="danger"
-                    plain
-                    slot="reference"
-                    class="deleteBtn"
+                <el-button size="small" type="danger" plain slot="reference" class="deleteBtn"
                     @click="deleteRechargeRecord(scope.$index, scope.row.id);  $event.stopPropagation()">
                   删 除</el-button>
               </template>
@@ -141,7 +91,7 @@
         <div class="settingStyleTitle">交易记录</div>
 
         <!-- 交易记录  -->
-        <div class="noticeInfoStyle">
+        <div class="ordersInfoStyle">
 
         </div>
 
@@ -151,9 +101,8 @@
 </template>
 
 <script>
-import {eventBus} from "@/main";
-import {deleteBatchSwiper, updateSwiperStatus, deleteSwiper, saveSwiper, loadSwiper} from "@/api/systemManage/noticeManage";
 import {deleteBatchRechargeRecords, deleteRechargeRecord, loadRechargeRecords} from "@/api/manage/orderManage";
+
 export default {
   data() {
     return{
@@ -191,9 +140,9 @@ export default {
       }
     },
     deleteBatchRechargeRecords() {
-      if (!this.ids.length) {
-        this.$message.warning('未选择数据！')
-        return
+      if (!this.ids || this.ids.length === 0) {
+        this.$message.warning('未选择数据！');
+        return;
       }
       this.$confirm('确认删除这些信息？', '确认删除', {type: 'warning'}).then(() => {
         deleteBatchRechargeRecords(this.ids).then(res => {
@@ -263,7 +212,7 @@ export default {
 </script>
 
 <style scoped>
-.userSettingStyle {
+.managerSettingStyle {
   background-color:#fff;
   width: 100%;
   height: calc(100vh - 100px);
@@ -307,7 +256,7 @@ export default {
   line-height: 28px;
   text-align: left;
 }
-.swpierInfoStyle{
+.recordsInfoStyle{
   text-align: left;
   border: 1px solid #ebeef5;
   padding: 16px;
@@ -315,7 +264,7 @@ export default {
   width: 98%;
   margin: 0 auto;
 }
-.noticeInfoStyle {
+.ordersInfoStyle {
   text-align: left;
   border: 1px solid #ebeef5;
   padding: 16px;
