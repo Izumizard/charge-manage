@@ -136,36 +136,3 @@
 
 
 </mapper>
-<!--        SELECT cs.id,-->
-<!--        cs.station_name,-->
-<!--        (SELECT COUNT(*) FROM charging_port WHERE station_id = cs.id) AS ports_count,-->
-<!--        GROUP_CONCAT(DISTINCT st.thumbnail)                           AS thumbnails,-->
-<!--        (SELECT SUM(IFNULL(service_fee, 0) + IFNULL(e_price, 0))-->
-<!--        FROM electricity_price-->
-<!--        WHERE station_id = cs.id-->
-<!--        AND NOW() BETWEEN start_time AND end_time)                 AS charging_fee,-->
-<!--        CASE-->
-<!--        WHEN TIME_TO_SEC(CURTIME()) >= TIME_TO_SEC('07:00:00') AND-->
-<!--        TIME_TO_SEC('23:00:00') > TIME_TO_SEC(CURTIME()) THEN-->
-<!--        (SELECT SUM(IFNULL(service_fee, 0) + IFNULL(e_price, 0))-->
-<!--        FROM electricity_price-->
-<!--        WHERE station_id = cs.id-->
-<!--        AND start_time = '23:00:00')-->
-<!--        WHEN TIME_TO_SEC(CURTIME()) >= TIME_TO_SEC('23:00:00') OR-->
-<!--        TIME_TO_SEC('07:00:00') > TIME_TO_SEC(CURTIME()) THEN-->
-<!--        (SELECT SUM(IFNULL(service_fee, 0) + IFNULL(e_price, 0))-->
-<!--        FROM electricity_price-->
-<!--        WHERE station_id = cs.id-->
-<!--        AND start_time = '07:00:00')-->
-<!--        END                                                       AS appoint_fee,-->
-<!--        cs.station_address,-->
-<!--        cs.parking_fee,-->
-<!--        cs.create_time,-->
-<!--        cs.station_longitude,-->
-<!--        cs.station_latitude,-->
-<!--        cs.station_status,-->
-<!--        cs.open_time-->
-<!--        FROM charging_station cs-->
-<!--        LEFT JOIN-->
-<!--        station_thumbnail st ON cs.id = st.station_id-->
-<!--        GROUP BY cs.id, cs.station_name;-->

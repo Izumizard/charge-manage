@@ -47,3 +47,15 @@ export function loadRechargeRecords(pageNum, pageSize, user_username) {
         }
     })
 }
+
+export function  loadOrders(pageNum, pageSize, username) {
+    return request({
+        url: '/orders/selectByPage',
+        method: 'get',
+        params: {
+            pageNum: pageNum,
+            pageSize: pageSize,
+            username: username
+        }
+    })
+}

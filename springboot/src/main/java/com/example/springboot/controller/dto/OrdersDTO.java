@@ -23,7 +23,7 @@ import java.sql.Timestamp;
 public class OrdersDTO {
     @TableId(type = IdType.AUTO)
     @Alias("序号")
-    private Long id;
+    private Integer id;
     @Alias("订单号")
     private String order_no;
     @Alias("充电站名称")
@@ -43,7 +43,7 @@ public class OrdersDTO {
     @Alias("订单创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Timestamp create_time;
-    @Alias("订单更新时间")
+    @Alias("订单完成时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Timestamp update_time;
     @Alias("订单价格")

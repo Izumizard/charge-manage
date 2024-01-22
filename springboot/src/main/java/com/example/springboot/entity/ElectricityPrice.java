@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.sql.Time;
 
 /**
  * 功能：电价实体类
@@ -23,11 +22,13 @@ public class ElectricityPrice {
     @TableId(type = IdType.AUTO)
     private Integer id;
     private Integer station_id;
-    private Time start_time;
-    private Time end_time;
+    private String start_time;
+    private String end_time;
     private String price_type;
     private BigDecimal e_price;
     private BigDecimal service_fee;
     @TableField(exist = false)
     private BigDecimal t_price;
+    @TableField(exist = false)
+    private String station_name;
 }

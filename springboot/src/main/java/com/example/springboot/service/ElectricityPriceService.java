@@ -2,6 +2,7 @@ package com.example.springboot.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.springboot.controller.dto.PriceDTO;
 import com.example.springboot.entity.ElectricityPrice;
 import com.example.springboot.mapper.ElectricityPriceMapper;
 import org.springframework.stereotype.Service;
@@ -29,5 +30,9 @@ public class ElectricityPriceService extends ServiceImpl<ElectricityPriceMapper,
         }
 
         return priceList;
+    }
+
+    public List<PriceDTO> getPriceInfo(Integer station_id) {
+        return electricityPriceMapper.getPrice(station_id);
     }
 }

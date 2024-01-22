@@ -2,4 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.springboot.mapper.ChargingPortMapper">
     <resultMap id="baseMapper" type="com.example.springboot.entity.ChargingPort" autoMapping="true" />
+    <select id="getPortsByPage" resultMap="baseMapper">
+        SELECT cp.*, cs.station_name as station_name
+        FROM charging_port cp
+        INNER JOIN charging_station cs ON cp.station_id = cs.id
+        <where>
+            <if test="station_name != null and station_name != ''">
+                AND cs.station_name LIKE CONCAT('%', #{station_name}, '%')
+            </if>
+            <if test="port_status != null and port_status != ''">
+                AND cp.port_status LIKE CONCAT('%', #{port_status}, '%')
+            </if>
+        </where>
+        ORDER BY cp.id ASC
+    </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.example.springboot.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.springboot.entity.ChargingStation;
 import com.example.springboot.mapper.ChargingStationMapper;
@@ -28,6 +29,12 @@ public class ChargingStationService extends ServiceImpl<ChargingStationMapper, C
         return  chargingStationMapper.searchAll();
     }
 
+    //鉴权 查询全部站点信息
+    public List<ChargingStation> selectByStation() {
+        QueryWrapper<ChargingStation> queryWrapper = new QueryWrapper<>();
+        return chargingStationMapper.selectList(queryWrapper);
+    }
+    //查询用户收藏站点信息
     public List<ChargingStation> searchStations(Integer user_id) {
         return  chargingStationMapper.searchStations(user_id);
     }

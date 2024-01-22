@@ -2,10 +2,8 @@ package com.example.springboot.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.springboot.common.constants.MqConstants;
 import com.example.springboot.common.mq.DelayMessageProcessor;
 import com.example.springboot.controller.dto.MultiDelayMessage;
-import com.example.springboot.controller.dto.OrdersRequest;
 import com.example.springboot.entity.ChargingPort;
 import com.example.springboot.entity.Orders;
 import com.example.springboot.exception.ServiceException;
@@ -19,6 +17,7 @@ import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 功能：
@@ -70,6 +69,7 @@ public class ChargingPortService extends ServiceImpl<ChargingPortMapper, Chargin
                 .update();
     }
 
+
     /**1.据订单中的时间判断是否到达可使用时间
      * 2.根据user_id和port表中的user_id判断是否为订单用户
      * 3.创建一个Queue 用于执行订单状态改变(根据OrdersRequest中的duration判断执行时长)
@@ -92,13 +92,17 @@ public class ChargingPortService extends ServiceImpl<ChargingPortMapper, Chargin
             if (currentTime.isBefore(startTime)) {
                 throw new ServiceException("400", "未到预约时间");
             }  if (currentTime.isAfter(endTime)) {
+                orders.setStatus("已结束");
+                orders.setUpdate_time(Timestamp.valueOf(LocalDateTime.now()));
+                port.setUser_Id(0);
+                port.setPort_status("空闲中");
+                chargingPortMapper.updateById(port);
+                ordersMapper.updateById(orders);
                 throw new ServiceException("400", "预约时间已结束");
             }
-            //TODO 2. 根据user_id和port表中的user_id判断是否为订单用户
             if (!orders.getUser_id().equals(port.getUser_Id())) {
                 throw new ServiceException("400", "你没在该时段预约！");
             } else {
-                //TODO 3. 创建延迟消息实现对订单状态的改变
                 try {
                     orders.setStatus("使用中");
                     port.setPort_status("充电中");
@@ -121,7 +125,4 @@ public class ChargingPortService extends ServiceImpl<ChargingPortMapper, Chargin
             }
         }
     }
-
-
-
 }

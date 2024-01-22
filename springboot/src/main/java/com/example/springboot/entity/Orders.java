@@ -30,16 +30,17 @@ public class Orders implements Serializable {
     @Alias("订单号")
     private String order_no;
     @TableField(exist = false)
+    private transient String username;
+    @TableField(exist = false)
     private transient Integer station_id;
     @TableField(exist = false)
     private transient String avatar;
     @TableField(exist = false)
-    private transient String port_number;
+    @Alias("充电桩序号")
+    private String port_number;
     @Alias("充电站名称")
     private String station_name;
-    @Alias("用户序号")
     private Integer user_id;
-    @Alias("充电桩序号")
     private Integer port_id;
     @Alias("预约开始时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -57,5 +58,6 @@ public class Orders implements Serializable {
     private Timestamp update_time;
     @Alias("订单价格")
     private BigDecimal price;
+    @Alias("预约时长")
     private Integer duration;
 }

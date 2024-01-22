@@ -492,10 +492,6 @@ export default {
 
 
   created() {
-    const tab = this.$route.query.tab;
-    if (tab) {
-      this.activeName = tab;
-    }
     this.load()
   },
 
@@ -507,13 +503,6 @@ export default {
     }
   },
 
-  watch: {
-    '$route.query.tab'(tab) {
-      if (tab) {
-        this.activeName = tab;
-      }
-    }
-  }
 }
 
 

@@ -22,5 +22,32 @@
         ORDER BY o.id DESC
     </select>
 
-
+    <select id="selectOrder" resultMap="baseMapper">
+        SELECT o.id, o.order_no, cp.station_id,
+               IFNULL(u.avatar, 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png') AS avatar,
+               cp.port_number, cs.station_name, o.user_id,
+               o.port_id, o.start_time, o.end_time, o.status, o.duration,
+               o.create_time, o.update_time, o.price
+        FROM orders o
+                 LEFT JOIN charging_port cp ON o.port_id = cp.id
+                 LEFT JOIN user u ON o.user_id = u.id
+                 LEFT JOIN charging_station cs ON cp.station_id = cs.id
+        WHERE o.user_id = #{user_id}
+          AND cp.port_number = #{port_number}
+          AND o.status = #{status}
+        ORDER BY o.id DESC
+    </select>
+    <select id="getOrdersByPage" resultMap="baseMapper">
+        SELECT o.*, cp.port_number, u.avatar, u.username
+        FROM orders o
+                 LEFT JOIN charging_port cp ON o.port_id = cp.id
+                 LEFT JOIN user u ON o.user_id = u.id
+                 LEFT JOIN charging_station cs ON cp.station_id = cs.id
+        <where>
+        <if test=" username != null and username != ''">
+            AND u.username LIKE CONCAT('%', #{username}, '%')
+        </if>
+        </where>
+        ORDER BY o.id DESC
+    </select>
 </mapper>

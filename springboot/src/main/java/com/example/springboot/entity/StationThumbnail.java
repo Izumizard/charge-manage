@@ -1,6 +1,7 @@
 package com.example.springboot.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
@@ -20,4 +21,6 @@ public class StationThumbnail {
     private Integer id;
     private Integer station_id;
     private String thumbnail;
+    @TableField(exist = false)
+    private String station_name;
 }

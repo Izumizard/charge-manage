@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.StationThumbnailMapper">
+    <resultMap id="baseMapper" type="com.example.springboot.entity.StationThumbnail" autoMapping="true">
+    </resultMap>
+    <select id="selectByStationName" resultMap="baseMapper">
+        SELECT st.*, cs.station_name
+        FROM station_thumbnail AS st
+                 INNER JOIN charging_station AS cs ON st.station_id = cs.id
+        WHERE cs.station_name LIKE CONCAT('%', #{station_name}, '%')
+        ORDER BY st.id DESC
+    </select>
+</mapper>

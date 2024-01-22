@@ -163,4 +163,16 @@ public class OrdersService extends ServiceImpl<OrdersMapper, Orders> {
         chargingPortService.changePort(orders.getPort_id());
     }
 
+
+    /**
+     * 扫码获取订单信息
+     */
+    public Orders selectOrder(Integer user_id, String port_number, String status) {
+        Orders orders = ordersMapper.selectOrder(user_id, port_number, status);
+        if (orders == null) {
+            throw new RuntimeException("你没有预约的订单！");
+        }
+        return orders;
+    }
+
 }

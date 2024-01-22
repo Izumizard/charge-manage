@@ -22,7 +22,7 @@
         LEFT JOIN user u ON rr.user_id = u.id
         <where>
             <if test="user_username != null and user_username != ''">
-                rr.user_username = #{user_username}
+                rr.user_username LIKE CONCAT('%', #{user_username}, '%')
             </if>
         </where>
         ORDER BY rr.id DESC

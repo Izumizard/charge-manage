@@ -1,20 +1,21 @@
 package com.example.springboot.controller;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.springboot.common.annotations.AuthAccess;
-import com.example.springboot.common.enums.LogType;
 import com.example.springboot.common.annotations.MessageLogs;
 import com.example.springboot.common.config.Result;
+import com.example.springboot.common.enums.LogType;
 import com.example.springboot.controller.dto.CollectionsDTO;
 import com.example.springboot.entity.ChargingStation;
-import com.example.springboot.entity.Collections;
 import com.example.springboot.service.ChargingStationService;
 import com.example.springboot.service.CollectionsService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
@@ -63,13 +64,13 @@ public class ChargingStationController {
         chargingStationService.updateById(chargingStation);
         return Result.success("修改成功！");
     }
-
     /**
      * 删除站点信息
      */
     @DeleteMapping("/delete/{id}")
     public Result delete(@PathVariable Integer id) {
         chargingStationService.removeById(id);
+
         return Result.success();
     }
 
@@ -81,6 +82,7 @@ public class ChargingStationController {
         chargingStationService.removeBatchByIds(ids);
         return Result.success();
     }
+
 
     /**
      * 查询全部站点信息
@@ -103,6 +105,18 @@ public class ChargingStationController {
         }
         return Result.success(stationList);
     }
+
+
+
+    /**
+     * 鉴权 查询全部站点信息
+     */
+    @GetMapping("/listOfStation")
+    public Result selectByStations() {
+        List<ChargingStation> stationList = chargingStationService.selectByStation();
+        return Result.success(stationList);
+    }
+
 
 
     /**
@@ -206,7 +220,6 @@ public class ChargingStationController {
         } else {
             // 全部导出或者条件导出
             queryWrapper.like(StrUtil.isNotBlank(station_name), "station_name", station_name);
-            queryWrapper.like(StrUtil.isNotBlank(station_status), "station_status", station_status);
         }
         list = chargingStationService.list(queryWrapper); // 查询出当前charging_station表的所有数据
         writer.write(list, true);
@@ -220,5 +233,25 @@ public class ChargingStationController {
         outputStream.close();
     }
 
+
+    /**
+     * 批量导入
+     * @param file 传入的excel文件对象
+     * @return  导出结果
+     */
+    @PostMapping("/import")
+    public Result importData(MultipartFile file) throws IOException {
+        ExcelReader reader = ExcelUtil.getReader(file.getInputStream());
+        List<ChargingStation> stationList = reader.readAll(ChargingStation.class);
+
+        //写入数据到数据库
+        try {
+            chargingStationService.saveBatch(stationList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("数据批量导入出错！");
+        }
+        return Result.success();
+    }
 
 }
