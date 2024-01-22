@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.ChargingStationMapper">
+    <resultMap id="baseMapper" type="com.example.springboot.entity.ChargingStation" autoMapping="true"/>
+
+    <!--  条件查询站点信息、当前时间段电价信息、站点充电桩数量 -->
+    <select id="selectChargingStation" resultMap="baseMapper">
+        SELECT cs.id,
+               cs.station_name,
+               (SELECT COUNT(*) FROM charging_port WHERE station_id = cs.id) AS ports_count,
+               GROUP_CONCAT(DISTINCT st.thumbnail)                           AS thumbnails,
+               (SELECT SUM(IFNULL(service_fee, 0) + IFNULL(e_price, 0))
+                FROM electricity_price
+                WHERE station_id = cs.id
+                  AND NOW() BETWEEN start_time AND end_time)                 AS charging_fee,
+               cs.station_address,
+               cs.parking_fee,
+               cs.create_time,
+               cs.station_longitude,
+               cs.station_latitude,
+               cs.station_status,
+               cs.open_time
+        FROM charging_station cs
+                 LEFT JOIN
+             station_thumbnail st ON cs.id = st.station_id
+        WHERE cs.station_name LIKE CONCAT('%', #{station_name}, '%')
+        GROUP BY cs.id, cs.station_name;
+    </select>
+
+    <resultMap id="stationMap" type="com.example.springboot.entity.ChargingStation" autoMapping="true">
+        <id column="id" property="id"/>
+        <result column="station_name" property="station_name"/>
+        <result column="station_longitude" property="station_longitude"/>
+        <result column="station_latitude" property="station_latitude"/>
+        <result column="station_address" property="station_address"/>
+        <result column="appoint_fee" property="appoint_fee"/>
+        <result column="charging_fee" property="charging_fee" />
+        <result column="create_time" property="create_time"/>
+        <result column="open_time" property="open_time" />
+        <result column="parking_fee" property="parking_fee"/>
+        <result column="ports_count" property="ports_count"/>
+        <result column="station_status" property="station_status" />
+        <collection property="collections" ofType="com.example.springboot.controller.dto.CollectionsDTO">
+            <id column="user_id" property="user_id"/>
+            <result column="station_id" property="station_id"/>
+            <result column="status" property="status"/>
+        </collection>
+    </resultMap>
+
+    <select id="searchAll" resultMap="stationMap">
+        SELECT
+            cs.id,
+            cs.station_name,
+            (SELECT COUNT(*) FROM charging_port WHERE station_id = cs.id) AS ports_count,
+            GROUP_CONCAT(DISTINCT st.thumbnail) AS thumbnails,
+            (SELECT SUM(IFNULL(service_fee, 0) + IFNULL(e_price, 0))
+             FROM electricity_price
+             WHERE station_id = cs.id
+               AND NOW() BETWEEN start_time AND end_time) AS charging_fee,
+            CASE
+                WHEN TIME_TO_SEC(CURTIME()) >= TIME_TO_SEC('07:00:00') AND
+                     TIME_TO_SEC('23:00:00') > TIME_TO_SEC(CURTIME()) THEN
+                    (SELECT SUM(IFNULL(service_fee, 0) + IFNULL(e_price, 0))
+                     FROM electricity_price
+                     WHERE station_id = cs.id
+                       AND start_time = '23:00:00')
+                WHEN TIME_TO_SEC(CURTIME()) >= TIME_TO_SEC('23:00:00') OR
+                     TIME_TO_SEC('07:00:00') > TIME_TO_SEC(CURTIME()) THEN
+                    (SELECT SUM(IFNULL(service_fee, 0) + IFNULL(e_price, 0))
+                     FROM electricity_price
+                     WHERE station_id = cs.id
+                       AND start_time = '07:00:00')
+                END AS appoint_fee,
+            cs.station_address,
+            cs.parking_fee,
+            cs.create_time,
+            cs.station_longitude,
+            cs.station_latitude,
+            cs.station_status,
+            cs.open_time,
+            MAX(c.user_id) AS user_id,
+            c.station_id,
+            c.status
+        FROM charging_station cs
+                 LEFT JOIN station_thumbnail st ON cs.id = st.station_id
+                 LEFT JOIN collections c ON cs.id = c.station_id
+        GROUP BY cs.id, cs.station_name, cs.station_address, cs.parking_fee, cs.create_time,
+                 cs.station_longitude, cs.station_latitude, cs.station_status, cs.open_time,
+                 c.station_id, c.status;
+    </select>
+
+
+    <select id="searchStations" resultMap="stationMap">
+        SELECT
+            cs.id,
+            cs.station_name,
+            (SELECT COUNT(*) FROM charging_port WHERE station_id = cs.id) AS ports_count,
+            GROUP_CONCAT(DISTINCT st.thumbnail) AS thumbnails,
+            (SELECT SUM(IFNULL(service_fee, 0) + IFNULL(e_price, 0))
+             FROM electricity_price
+             WHERE station_id = cs.id
+               AND NOW() BETWEEN start_time AND end_time) AS charging_fee,
+            CASE
+                WHEN TIME_TO_SEC(CURTIME()) >= TIME_TO_SEC('07:00:00') AND
+                     TIME_TO_SEC('23:00:00') > TIME_TO_SEC(CURTIME()) THEN
+                    (SELECT SUM(IFNULL(service_fee, 0) + IFNULL(e_price, 0))
+                     FROM electricity_price
+                     WHERE station_id = cs.id
+                       AND start_time = '23:00:00')
+                WHEN TIME_TO_SEC(CURTIME()) >= TIME_TO_SEC('23:00:00') OR
+                     TIME_TO_SEC('07:00:00') > TIME_TO_SEC(CURTIME()) THEN
+                    (SELECT SUM(IFNULL(service_fee, 0) + IFNULL(e_price, 0))
+                     FROM electricity_price
+                     WHERE station_id = cs.id
+                       AND start_time = '07:00:00')
+                END AS appoint_fee,
+            cs.station_address,
+            cs.parking_fee,
+            cs.create_time,
+            cs.station_longitude,
+            cs.station_latitude,
+            cs.station_status,
+            cs.open_time,
+            MAX(c.user_id) AS user_id,
+            c.station_id,
+            c.status
+        FROM charging_station cs
+                 LEFT JOIN station_thumbnail st ON cs.id = st.station_id
+                 LEFT JOIN collections c ON cs.id = c.station_id
+        WHERE c.user_id = #{user_id} AND c.status = true
+        GROUP BY cs.id, cs.station_name, cs.station_address, cs.parking_fee, cs.create_time,
+                 cs.station_longitude, cs.station_latitude, cs.station_status, cs.open_time,
+                 c.station_id, c.status;
+    </select>
+
+
+
+</mapper>
+<!--        SELECT cs.id,-->
+<!--        cs.station_name,-->
+<!--        (SELECT COUNT(*) FROM charging_port WHERE station_id = cs.id) AS ports_count,-->
+<!--        GROUP_CONCAT(DISTINCT st.thumbnail)                           AS thumbnails,-->
+<!--        (SELECT SUM(IFNULL(service_fee, 0) + IFNULL(e_price, 0))-->
+<!--        FROM electricity_price-->
+<!--        WHERE station_id = cs.id-->
+<!--        AND NOW() BETWEEN start_time AND end_time)                 AS charging_fee,-->
+<!--        CASE-->
+<!--        WHEN TIME_TO_SEC(CURTIME()) >= TIME_TO_SEC('07:00:00') AND-->
+<!--        TIME_TO_SEC('23:00:00') > TIME_TO_SEC(CURTIME()) THEN-->
+<!--        (SELECT SUM(IFNULL(service_fee, 0) + IFNULL(e_price, 0))-->
+<!--        FROM electricity_price-->
+<!--        WHERE station_id = cs.id-->
+<!--        AND start_time = '23:00:00')-->
+<!--        WHEN TIME_TO_SEC(CURTIME()) >= TIME_TO_SEC('23:00:00') OR-->
+<!--        TIME_TO_SEC('07:00:00') > TIME_TO_SEC(CURTIME()) THEN-->
+<!--        (SELECT SUM(IFNULL(service_fee, 0) + IFNULL(e_price, 0))-->
+<!--        FROM electricity_price-->
+<!--        WHERE station_id = cs.id-->
+<!--        AND start_time = '07:00:00')-->
+<!--        END                                                       AS appoint_fee,-->
+<!--        cs.station_address,-->
+<!--        cs.parking_fee,-->
+<!--        cs.create_time,-->
+<!--        cs.station_longitude,-->
+<!--        cs.station_latitude,-->
+<!--        cs.station_status,-->
+<!--        cs.open_time-->
+<!--        FROM charging_station cs-->
+<!--        LEFT JOIN-->
+<!--        station_thumbnail st ON cs.id = st.station_id-->
+<!--        GROUP BY cs.id, cs.station_name;-->
