@@ -14,11 +14,12 @@ import java.time.LocalTime;
 public class PriceDTO {
     private Integer start;
     private Integer end;
-    private Time start_time;
-    private Time end_time;
+    private String start_time;
+    private String end_time;
     private BigDecimal price;
 
     public void setStart_time(Time start_time) {
+        this.start_time = start_time.toString();
         this.start = start_time.toLocalTime().getHour();
     }
 
@@ -27,8 +28,10 @@ public class PriceDTO {
         if (localTime.equals(LocalTime.of(23, 59, 59))) {
             this.end = 24;
         } else {
+            this.end_time = end_time.toString();
             this.end = localTime.getHour();
         }
     }
+
 }
 

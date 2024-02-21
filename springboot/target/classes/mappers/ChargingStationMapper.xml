@@ -56,7 +56,8 @@
             (SELECT SUM(IFNULL(service_fee, 0) + IFNULL(e_price, 0))
              FROM electricity_price
              WHERE station_id = cs.id
-               AND NOW() BETWEEN start_time AND end_time) AS charging_fee,
+               AND CURTIME() >= start_time
+               AND end_time > CURTIME()) AS charging_fee,
             CASE
                 WHEN TIME_TO_SEC(CURTIME()) >= TIME_TO_SEC('07:00:00') AND
                      TIME_TO_SEC('23:00:00') > TIME_TO_SEC(CURTIME()) THEN
@@ -99,7 +100,8 @@
             (SELECT SUM(IFNULL(service_fee, 0) + IFNULL(e_price, 0))
              FROM electricity_price
              WHERE station_id = cs.id
-               AND NOW() BETWEEN start_time AND end_time) AS charging_fee,
+               AND CURTIME() >= start_time
+               AND end_time > CURTIME()) AS charging_fee,
             CASE
                 WHEN TIME_TO_SEC(CURTIME()) >= TIME_TO_SEC('07:00:00') AND
                      TIME_TO_SEC('23:00:00') > TIME_TO_SEC(CURTIME()) THEN
