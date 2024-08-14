@@ -1,7 +1,7 @@
 package com.example.springboot.common.config;
 
 /**
- * 功能：
+ * 功能：跨域
  * 日期：2023/9/22 23:13
  */
 import org.springframework.context.annotation.Bean;

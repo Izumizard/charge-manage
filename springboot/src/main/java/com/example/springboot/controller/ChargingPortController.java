@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 功能：
+ * 功能：充电桩接口
  * 日期：2023/11/21 0:21
  */
 @RestController

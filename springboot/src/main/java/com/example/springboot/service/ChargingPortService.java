@@ -77,7 +77,8 @@ public class ChargingPortService extends ServiceImpl<ChargingPortMapper, Chargin
 
     public void useOrder(String port_number) {
         // 根据 port_number 查询 port 表中的 port_id
-        ChargingPort port = chargingPortMapper.selectOne(new QueryWrapper<ChargingPort>().eq("port_number", port_number));
+        ChargingPort port = chargingPortMapper.selectOne(new QueryWrapper<ChargingPort>()
+                .eq("port_number", port_number));
         if (port != null) {
             // 1.当前时间是否在订单的预约时间范围内
             LocalDateTime currentTime = LocalDateTime.now();

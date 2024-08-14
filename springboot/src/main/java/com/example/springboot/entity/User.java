@@ -39,7 +39,6 @@ public class User {
     private String avatar;
     @Alias("角色")
     private String role;
-
     @TableField(exist = false)
     private  transient String token;
 }

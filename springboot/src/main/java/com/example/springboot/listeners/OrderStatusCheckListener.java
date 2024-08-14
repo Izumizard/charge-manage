@@ -39,6 +39,7 @@ public class OrderStatusCheckListener {
             key = MqConstants.DELAY_ORDER_ROUTING_KEY
     ))
     public void listenOrderDelayMessage(MultiDelayMessage<Long> msg) {
+        System.out.println("开始查询订单状态");
         // 1.查询订单状态
         Orders orders = ordersService.getById(msg.getData());
         // 2.判断是否已经支付
@@ -58,5 +59,6 @@ public class OrderStatusCheckListener {
         }
         // 4.不存在，取消订单
         ordersService.cancelOrder(orders.getId());
+        System.out.println("订单已取消");
     }
 }

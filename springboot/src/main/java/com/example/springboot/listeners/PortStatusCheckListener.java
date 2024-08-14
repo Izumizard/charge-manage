@@ -44,5 +44,6 @@ public class PortStatusCheckListener {
             return;
         }
         ordersService.successOrder(orders.getId());
+        System.out.println("充电桩使用结束");
     }
 }

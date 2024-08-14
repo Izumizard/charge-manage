@@ -6,12 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
+import java.io.Serializable;
 import java.util.List;
 
 
 @Data
 @NoArgsConstructor
-public class MultiDelayMessage<T> {
+public class MultiDelayMessage<T> implements Serializable {
     //消息体
     private T data;
     //记录延迟时间的集合
